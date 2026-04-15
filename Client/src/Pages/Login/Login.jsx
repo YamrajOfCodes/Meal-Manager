@@ -120,7 +120,7 @@ const stats = [
   { num: "4.9★", label: "Avg. rating" },
 ];
 
-
+const roles = ["Owner / Admin", "Delivery Staff", "Cook"];
 
 // ─── Feature Card ────────────────────────────────────────────────────────────
 function FeatureCard({ feature }) {
