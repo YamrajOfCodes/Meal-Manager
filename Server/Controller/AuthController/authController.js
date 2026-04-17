@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 export const RegisterUser = async (req, res) => {
   try {
-    const { name, email, password, phone, role, MessName } = req.body;
+    const { name, email, password, phone, role, messName, messCode } = req.body;
 
     if (!name || !email || !password || !phone || !role) {
       return res.status(400).json({ message: "All required fields must be filled" });
@@ -22,13 +22,22 @@ export const RegisterUser = async (req, res) => {
       password,
       phone,
       role,
-      MessName
+      messName,
+      messCode,
+      isactive: role === "owner" ? false : true
     });
 
     await newUser.save();
 
     const userData = newUser.toObject();
     delete userData.password;
+
+    if(role === "owner"){
+      return res.status(200).json({
+        message: "We Successfully registered you as an owner, please wait for admin approval",
+        data: userData,
+      });
+    }
 
     res.status(201).json({
       message: "User registered successfully",
@@ -62,6 +71,12 @@ export const RegisterUser = async (req, res) => {
     if (!validpassword) {
         return res.status(400).json({ error: "Password is incorrect" });
     }
+
+
+    if (!validUser.isactive) {
+        return res.status(400).json({ error: "Your account is not yet approved" });
+    }
+
 
     const access_token = await validUser.generateToken();
     

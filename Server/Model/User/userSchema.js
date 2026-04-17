@@ -25,13 +25,21 @@ const userSchema = new mongoose.Schema({
     required:true
   },
 
-  MessName:{
+  messName:{
     type:String
+  },
+
+  messCode:{
+   type:String
+  },
+
+  isactive:{
+    type:Boolean
   },
 
   role: {
     type: String,
-    enum: ["superadmin", "admin", "user"],
+    enum: ["superadmin", "owner", "user"],
   },
 
  tokens: [

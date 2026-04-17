@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useRegister,useLogin} from "../../hooks/authHooks/authHooks";
 
 // Tiffin box SVG icon
 const TiffinIcon = ({ size = 24, color = "white", strokeWidth = 2 }) => (
@@ -113,6 +114,29 @@ const features = [
   },
 ];
 
+
+const loginFields = [
+  { id: "email", label: "Email address", type: "email", ph: "you@example.com" },
+  { id: "password", label: "Password", type: "password", ph: "••••••••" },
+];
+
+const registerOwnerFields = [
+  { id: "name", label: "Full name", type: "text", ph: "Ramesh Patil" },
+  { id: "email", label: "Email address", type: "email", ph: "you@example.com" },
+  { id: "phone", label: "Phone number", type: "tel", ph: "+91 98765 43210" },
+  { id: "password", label: "Password", type: "password", ph: "••••••••" },
+  { id: "messName", label: "Mess name", type: "text", ph: "Shree Sai Mess" },
+  { id: "messCode", label: "Mess code", type: "text", ph: "Choose a unique code" },
+];
+
+const registerUserFields = [
+  { id: "name", label: "Full name", type: "text", ph: "Ramesh Patil" },
+  { id: "email", label: "Email address", type: "email", ph: "you@example.com" },
+  { id: "phone", label: "Phone number", type: "tel", ph: "+91 98765 43210" },
+  { id: "password", label: "Password", type: "password", ph: "••••••••" },
+  { id: "messCode", label: "Mess code", type: "text", ph: "Code from your mess owner" },
+];
+
 const stats = [
   { num: "500+", label: "Mess owners" },
   { num: "1.2L+", label: "Meals tracked daily" },
@@ -120,7 +144,6 @@ const stats = [
   { num: "4.9★", label: "Avg. rating" },
 ];
 
-const roles = ["Owner / Admin", "Delivery Staff", "Cook"];
 
 // ─── Feature Card ────────────────────────────────────────────────────────────
 function FeatureCard({ feature }) {
@@ -141,11 +164,46 @@ export default function TiffinTrackSignIn() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
+  const {mutate:login,isSuccess:isLoginSuccess,isPending:isLoginPending} = useLogin();
+  const {mutate:register,isSuccess:isRegisterSuccess,isPending:isRegisterPending} = useRegister();
 
-  const handleLogin = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1800);
+  const [mode, setMode] = useState("login");
+  const [role, setRole] = useState("owner");
+  const [form, setForm] = useState({});
+
+
+  const switchMode = (m) => {
+    setMode(m);
+    setForm({});
   };
+
+  const fields =
+    mode === "login"
+      ? loginFields
+      : role === "owner"
+      ? registerOwnerFields
+      : registerUserFields;
+
+  const inputCls =
+    "w-full px-3 py-2.5 text-sm rounded-lg border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100 transition";
+
+  const labelCls = "block text-[11px] font-medium text-stone-500 mb-1";
+const update = (k, v) => setForm({ ...form, [k]: v });
+
+const handleLogin = () => {
+  const payload = { ...form, role };  // build complete object synchronously
+
+  setLoading(true);
+  setTimeout(() => setLoading(false), 1800);
+
+  mode === "login" ? login(payload) : register(payload);
+  console.log(payload); // this will also log correctly now
+
+  if(isRegisterSuccess){
+    setMode("login");
+    setForm({ email: form.email, password: form.password }); // pre-fill login form with registered email and password
+  }
+};
 
   return (
     <div className="flex min-h-screen overflow-hidden bg-amber-50 font-sans">
@@ -214,113 +272,98 @@ export default function TiffinTrackSignIn() {
       </div>
 
       {/* ══════════ RIGHT PANEL ══════════ */}
-     <div className="w-full md:w-[440px] shrink-0 bg-amber-50 border-l border-amber-100 flex flex-col items-center justify-center px-9 py-10 relative">
 
-  {/* ─── Inner Card (depth added) ─── */}
-  <div className="w-full bg-white rounded-2xl shadow-xl border border-amber-100 p-7">
+     <div className="flex w-[440px] items-center justify-center min-h-screen bg-stone-100 px-4">
+      <div className="w-full max-w-sm bg-white rounded-2xl border border-stone-200 overflow-hidden">
 
-    {/* Logo */}
-    <div className="flex flex-col items-center mb-6">
-      <div className="w-14 h-14 bg-amber-900 rounded-2xl flex items-center justify-center mb-2 shadow-lg shadow-amber-900/30">
-        <TiffinIcon size={28} />
+        {/* Top accent bar */}
+        <div className="h-1 bg-amber-700 w-full" />
+
+        <div className="px-7 py-7">
+
+          {/* Brand */}
+          <div className="flex items-center gap-2.5 mb-7">
+            <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="#854F0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-stone-900 leading-tight">MessMate</p>
+              <p className="text-[11px] text-stone-400">Your mess, managed.</p>
+            </div>
+          </div>
+
+          {/* Heading */}
+          <div className="mb-5">
+            <p className="text-lg font-medium text-stone-900">
+              {mode === "login" ? "Welcome back" : "Create account"}
+            </p>
+            <p className="text-[12px] text-stone-400 mt-0.5">
+              {mode === "login"
+                ? "Sign in to continue to your mess dashboard"
+                : "Start managing your mess digitally"}
+            </p>
+          </div>
+
+          {/* Role toggle (register only) */}
+          {mode === "register" && (
+            <div className="flex gap-2 mb-5">
+              {[
+                { val: "owner", label: "Mess owner" },
+                { val: "user", label: "User" },
+              ].map(({ val, label }) => (
+                <button
+                  key={val}
+                  onClick={() => setRole(val)}
+                  className={`flex-1 py-2 text-xs font-medium rounded-lg border transition ${
+                    role === val
+                      ? "bg-amber-50 border-amber-600 text-amber-900"
+                      : "bg-white border-stone-200 text-stone-500"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Fields */}
+          <div className="space-y-3">
+            {fields.map(({ id, label, type, ph }) => (
+              <div key={id}>
+                <label className={labelCls}>{label}</label>
+                <input
+                  type={type}
+                  placeholder={ph}
+                  value={form[id] || ""}
+                  onChange={(e) => update(id, e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <button className="w-full cursor-pointer mt-5 py-2.5 rounded-lg bg-amber-800 hover:bg-amber-900 text-amber-50 text-sm font-medium transition" onClick={handleLogin} disabled={isLoginPending || isRegisterPending}>
+            {(isLoginPending || isRegisterPending) ? (mode === "login" ? "Signing in..." : "Creating account...") : (mode === "login" ? "Sign in" : "Create account")}
+          </button>
+
+          {/* Switch */}
+          <p className="text-center text-[11px] text-stone-400 mt-4">
+            {mode === "login" ? "New here?" : "Already have an account?"}
+            <button
+              onClick={() => switchMode(mode === "login" ? "register" : "login")}
+              className="ml-1 text-amber-700 font-medium"
+            >
+              {mode === "login" ? "Register" : "Sign in"}
+            </button>
+          </p>
+        </div>
       </div>
-      <p className="font-serif text-lg text-amber-950">TiffinTrack</p>
-      <p className="text-[11px] text-stone-500 mt-0.5 tracking-wide">
-        Mess Management Platform
-      </p>
     </div>
-
-    {/* Heading */}
-    <div className="text-center mb-5">
-      <h2 className="font-serif text-[22px] text-amber-950 mb-1">
-        Welcome Back
-      </h2>
-      <p className="text-xs text-stone-500 leading-relaxed">
-        Sign in to manage orders, deliveries & customers
-      </p>
-    </div>
-
-  
-
-    {/* Email / Mobile */}
-    <div className="mb-3.5">
-      <label className="block text-[11px] font-medium text-stone-700 mb-1 uppercase tracking-wide">
-        Mobile / Email
-      </label>
-
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="9876543210 or you@mess.com"
-          value={user}
-          onChange={(e) => setUser(e.target.value)}
-          className="w-full px-3.5 py-2.5 pr-9 rounded-xl border border-stone-300 bg-white text-sm focus:border-amber-600 focus:ring-2 focus:ring-amber-600/10 outline-none"
-        />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400">
-          <UserIcon />
-        </span>
-      </div>
-    </div>
-
-    {/* Password */}
-    <div className="mb-3.5">
-      <label className="block text-[11px] font-medium text-stone-700 mb-1 uppercase tracking-wide">
-        Password
-      </label>
-
-      <div className="relative">
-        <input
-          type={showPass ? "text" : "password"}
-          placeholder="••••••••"
-          value={pass}
-          onChange={(e) => setPass(e.target.value)}
-          className="w-full px-3.5 py-2.5 pr-9 rounded-xl border border-stone-300 bg-white text-sm focus:border-amber-600 focus:ring-2 focus:ring-amber-600/10 outline-none"
-        />
-
-        <button
-          type="button"
-          onClick={() => setShowPass(!showPass)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-        >
-          {showPass ? <EyeOffIcon /> : <EyeIcon />}
-        </button>
-      </div>
-    </div>
-
-    {/* Remember / Forgot */}
-    <div className="flex justify-between items-center mb-5 text-xs">
-      <label className="flex items-center gap-2 text-stone-500 cursor-pointer">
-        <input type="checkbox" className="w-3.5 h-3.5 accent-amber-900" />
-        Remember me
-      </label>
-
-      <a href="#" className="text-amber-700 font-medium hover:underline">
-        Forgot?
-      </a>
-    </div>
-
-    {/* Button */}
-    <button
-      onClick={handleLogin}
-      disabled={loading}
-      className="w-full py-3 rounded-xl bg-amber-900 text-white text-sm font-semibold shadow-lg shadow-amber-900/30 hover:bg-amber-950 hover:-translate-y-px transition"
-    >
-      {loading ? "Signing in..." : "Sign In"}
-    </button>
-
-    {/* Trust */}
-    <div className="flex justify-center gap-4 text-[10px] text-stone-400 mt-4">
-      <span>🔒 Secure</span>
-      <span>⚡ Fast</span>
-      <span>📦 Real-time</span>
-    </div>
-  </div>
-
-  {/* Version */}
-  <span className="absolute bottom-4 right-5 text-[10px] text-stone-300">
-    Build v2.4.1
-  </span>
-</div>
     </div>
   );
 }

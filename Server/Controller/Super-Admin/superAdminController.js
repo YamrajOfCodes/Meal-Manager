@@ -1,39 +1,35 @@
 import User from "../../Model/User/userSchema.js";
-import cloudinary from "../../Cloudinary/cloudinary.js";
 
-export const RegisterUser = async (req, res) => {
+
+
+export const getAllOwners = async(req,res)=>{
   try {
-    const { name, email, password, phone, role } = req.body;
+      const ownersData = await User.find({role:"owner"});
+      return res.status(200).json({message:"Owners fetched successfully", data:ownersData});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+}
 
-    if (!name || !email || !password || !phone || !role) {
-      return res.status(400).json({ message: "All required fields must be filled" });
+
+
+export const UpdateMessStatus = async (req, res) => {
+  try {
+    const { ownerId, newStatus } = req.body;
+    if (!ownerId || !newStatus) {
+      return res.status(400).json({ message: "Owner ID and new status are required" });
     }
 
-    const existingUser = await User.findOne({ email });
-    const existingMob  = await User.findOne({phone});
-
-    if (existingUser || existingMob) {
-      return res.status(400).json({ message: "User already exists" });
+    const user = await User.findById(ownerId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const newUser = new User({
-      name,
-      email,
-      password,
-      phone,
-      role
-    });
+    user.messStatus = newStatus;
+    await user.save();
 
-    await newUser.save();
-
-    const userData = newUser.toObject();
-    delete userData.password;
-
-    res.status(201).json({
-      message: "User registered successfully",
-      data: userData,
-      token
-    });
+    res.status(200).json({ message: "Mess status updated successfully", data: user });
 
   } catch (error) {
     console.log(error);
@@ -41,6 +37,3 @@ export const RegisterUser = async (req, res) => {
   }
 };
 
-export const RegisterHostel = (req,res)=>{
-  
-}

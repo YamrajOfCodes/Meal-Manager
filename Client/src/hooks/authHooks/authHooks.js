@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { login, logout } from "../../types/Auth/authAPI"
+import { login, logout, register } from "../../types/Auth/authAPI"
 
 import toast from 'react-hot-toast';
 import {jwtDecode} from 'jwt-decode';
@@ -35,13 +35,37 @@ export const useLogin = () => {
 
     onError: (error) => {
       const message =
-        error?.response?.data?.message || 'Something went wrong';
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Something went wrong';
 
       if (error?.response?.status === 401) {
         toast.error('Invalid email or password');
       } else {
         toast.error(message);
       }
+    },
+  });
+};
+
+export const useRegister = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: register,
+
+    onSuccess: (data) => {
+      toast.success(data?.message || 'Registration successful');
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+    },
+
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Registration failed';
+
+      toast.error(message);
     },
   });
 };
