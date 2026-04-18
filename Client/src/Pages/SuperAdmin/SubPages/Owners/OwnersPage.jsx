@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { ActionBtn, Avatar, Badge, Card, FieldLabel, InputRow, Modal, Toggle } from "../../../../components/SuperAdmin/Shared/SharedComponents";
+import { useDeleteMessOwner, useUpdateMessOwner, useUpdateMessStatus } from "../../../../hooks/SuperAdmin/superAdminHooks";
 
 function OwnersPage({ owners, setOwners }){
+
+
+
+  const {mutate: updateMessStatus,isPending,isSuccess} = useUpdateMessStatus();
+  const {mutate: updateMessOwner} = useUpdateMessOwner();
+  const {mutate: deleteMessOwner} = useDeleteMessOwner();
 
     const fmt      = n => "₹" + Number(n).toLocaleString("en-IN");
   const ownerHue = id => HUES[(id-1) % HUES.length];
@@ -31,11 +38,32 @@ function OwnersPage({ owners, setOwners }){
   });
 
   const toggleStatus = (id)=>{
+    console.log(owners?.[0]?.isactive)
+
+     let flagdata;
+    if(owners?.[0]?.isactive==true){
+      flagdata=false;
+    }else{
+      flagdata=true;
+    }
   console.log(!owners.isactive)
+  const data = {
+    ownerId:id, 
+    newStatus:flagdata
+  };
+  updateMessStatus(data);
   }
   const openEdit     = o  => { setEditOwner(o); setForm({...o}); };
-  const saveEdit     = () => { setOwners(prev=>prev.map(o=>o.id===form.id?{...form}:o)); setEditOwner(null); };
-  const confirmDel   = () => { setOwners(prev=>prev.filter(o=>o.id!==deleteId)); setDeleteId(null); };
+
+   const saveEdit = ()=>{
+     updateMessOwner(form);
+     setEditOwner(null);
+   }
+
+  const confirmDel   = () => { 
+    deleteMessOwner(deleteId);
+    setDeleteId(null);
+   };
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
@@ -111,7 +139,7 @@ function OwnersPage({ owners, setOwners }){
                   <td style={{ padding:"12px 16px" }}>
                     <div style={{ display:"flex", gap:6 }}>
                       <ActionBtn onClick={()=>openEdit(o)} bg="#eff6ff" color="#1d5fa6">Edit</ActionBtn>
-                      <ActionBtn onClick={()=>setDeleteId(o.id)} bg="#fef2f2" color="#b91c1c">Delete</ActionBtn>
+                      <ActionBtn onClick={()=>setDeleteId(o._id)} bg="#fef2f2" color="#b91c1c">Delete</ActionBtn>
                     </div>
                   </td>
                 </tr>
@@ -125,7 +153,7 @@ function OwnersPage({ owners, setOwners }){
       <Modal open={!!editOwner} onClose={()=>setEditOwner(null)} title={`Edit — ${editOwner?.name}`}>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 16px" }}>
           <InputRow label="Owner Name" value={form.name||""}  onChange={v=>setForm({...form,name:v})}/>
-          <InputRow label="Mess Name"  value={form.mess||""}  onChange={v=>setForm({...form,mess:v})}/>
+          <InputRow label="Mess Name"  value={form.messName||""}  onChange={v=>setForm({...form,messName:v})}/>
           <InputRow label="City"       value={form.city||""}  onChange={v=>setForm({...form,city:v})}/>
           <InputRow label="Phone"      value={form.phone||""} onChange={v=>setForm({...form,phone:v})}/>
           <div style={{ gridColumn:"span 2" }}>

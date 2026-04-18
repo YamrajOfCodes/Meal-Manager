@@ -4,6 +4,7 @@ import OrdersPage from "./SubPages/Order/OrdersPage";
 import PaymentsPage from "./SubPages/Payments/PaymenntsPage";
 import NoticesPage from "./SubPages/Notice/NoticePage";
 import MenuPage from "./SubPages/Menu/MenuPage";
+import CustomersPage from "./SubPages/Customers/CustomersPage";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -122,7 +123,7 @@ export default function MessDashboard() {
           {page === "menu"      && <MenuPage />}
           {(page === "customers" || page === "reports" || page === "settings") && (
             <div className="flex items-center justify-center h-64 text-[#9a8f82] text-sm">
-              {pageTitle} — coming soon
+              <CustomersPage/>
             </div>
           )}
         </div>

@@ -127,6 +127,8 @@ const registerOwnerFields = [
   { id: "password", label: "Password", type: "password", ph: "••••••••" },
   { id: "messName", label: "Mess name", type: "text", ph: "Shree Sai Mess" },
   { id: "messCode", label: "Mess code", type: "text", ph: "Choose a unique code" },
+  { id: "city", label: "City", type: "text", ph: "Enter your city" },
+
 ];
 
 const registerUserFields = [
@@ -134,6 +136,7 @@ const registerUserFields = [
   { id: "email", label: "Email address", type: "email", ph: "you@example.com" },
   { id: "phone", label: "Phone number", type: "tel", ph: "+91 98765 43210" },
   { id: "password", label: "Password", type: "password", ph: "••••••••" },
+  { id: "city", label: "City", type: "text", ph: "Enter your city" },
   { id: "messCode", label: "Mess code", type: "text", ph: "Code from your mess owner" },
 ];
 
