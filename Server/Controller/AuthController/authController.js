@@ -3,9 +3,9 @@ import bcrypt from "bcrypt";
 
 export const RegisterUser = async (req, res) => {
   try {
-    const { name, email, password, phone, role, messName, messCode } = req.body;
+    const { name, email, password, phone, city, role, messName, messCode } = req.body;
 
-    if (!name || !email || !password || !phone || !role) {
+    if (!name || !email || !password || !phone || !city || !role) {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
 
@@ -22,6 +22,7 @@ export const RegisterUser = async (req, res) => {
       password,
       phone,
       role,
+      city,
       messName,
       messCode,
       isactive: role === "owner" ? false : true
@@ -91,3 +92,20 @@ export const RegisterUser = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
 }
  }
+
+ export const getUserData = async(req,res)=>{  
+
+  try {
+     const {userId} = req.params;
+     const findUsre = await User.findById(userId);
+      if(!findUsre){
+        return res.status(404).json({ error: "User not found" });
+      }
+      const userData = findUsre.toObject();
+      delete userData.password;
+      res.status(200).json({message:"User data fetched successfully", data:userData});
+  } catch (error) {
+    console.log(error)
+  }
+
+  }

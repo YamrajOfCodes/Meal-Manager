@@ -18,6 +18,9 @@ app.use("/api/auth",authRouter);
 import userRouter from "./Routes/User/userRoutes.js";
 app.use("/api/user",userRouter);
 
+import adminRouter from "./Routes/Admin/adminRoutes.js";
+app.use("/api/admin",adminRouter);
+
 import SuperAdminRouter from "./Routes/SuperAdmin/superAdminRoutes.js";
 app.use("/api/superAdmin",SuperAdminRouter);
 

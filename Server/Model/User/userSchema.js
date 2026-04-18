@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema({
     required:true
   },
 
+  city:{
+    type:String,
+    required:true
+  },
+
   messName:{
     type:String
   },
@@ -66,6 +71,7 @@ userSchema.methods.generateToken = async function () {
       {
         _id: this._id,
         role: this.role,
+        messCode: this.messCode
       },
       USER_SECRET,
       { expiresIn: "1d" }
