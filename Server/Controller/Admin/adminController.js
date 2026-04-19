@@ -1,25 +1,55 @@
+import Menu from "../../Model/Menu/menuSchema.js";
 
+export const addMenuItem = async (req, res) => {
+  try {
+    const { messCode, name, price, isVeg, mealTime } = req.body;
 
-import User from "../../Model/User/userSchema.js";
-
-export const getAllCustomers = async(req,res)=>{
-    try {
-        const {messCode} = req.query;
-        console.log('Received messCode:', messCode);
-        console.log('Request query:', req.query);
-
-        if(!messCode){
-            console.log('Mess code is missing');
-            return res.status(400).json({message:"Mess code is required"});
-        }
-
-        const users = await User.find({messCode})
-        console.log('Found users:', users);
-        console.log('Number of users found:', users.length);
-
-        return res.status(200).json({message:"Users fetched successfully", data:users});
-    } catch (error) {
-        console.log('Error in getAllCustomers:', error);
-        return res.status(500).json({ message: "Server Error" });
+    if (!messCode || !name || !price || !mealTime) {
+      return res.status(400).json({ message: "messCode, name, price and mealTime are required" });
     }
-}
+
+    const item = await Menu.create({ messCode, name, price, isVeg, mealTime });
+
+    res.status(201).json({ message: "Menu item added successfully", data: item });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// GET /api/menu/:messCode
+export const getMenu = async (req, res) => {
+  try {
+    const items = await Menu.find({ messCode: req.params.messCode });
+
+    res.status(200).json({ message: "Menu fetched successfully", data: items });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// DELETE /api/menu/:id
+export const deleteMenuItem = async (req, res) => {
+  try {
+    const item = await Menu.findByIdAndDelete(req.params.id);
+
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    res.status(200).json({ message: "Item deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// PUT /api/menu/:id
+// body: { name, price, isVeg, mealTime }
+export const updateMenuItem = async (req, res) => {
+  try {
+    const item = await Menu.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    res.status(200).json({ message: "Item updated successfully", data: item });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

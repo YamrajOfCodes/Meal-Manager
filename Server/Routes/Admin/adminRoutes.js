@@ -1,8 +1,13 @@
 import express from "express";
 const router  = express.Router();
-import {getAllCustomers} from "../../Controller/Admin/adminController.js"
+import { addMenuItem, getMenu, deleteMenuItem, updateMenuItem } from "../../Controller/Admin/adminController.js";
 
-router.get("/getAllCustomers", getAllCustomers);
+
+
+router.post("/addMenu",addMenuItem);
+router.get("/getMenu/:messCode",getMenu);
+router.delete("/deleteMenu/:id",deleteMenuItem);
+router.put("/updateMenu/:id",updateMenuItem);
 
 
 
