@@ -1,7 +1,10 @@
 import mongoose from "mongoose"
 import bcrypt from "bcrypt"
-const USER_SECRET = "sdoskdok"
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+
+dotenv.config();
+const USER_SECRET = process.env.USER_SECRET
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -44,7 +47,7 @@ const userSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ["superadmin", "owner", "user"],
+    enum: ["superadmin", "owner", "customer"],
   },
 
  tokens: [
