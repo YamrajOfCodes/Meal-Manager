@@ -5,7 +5,7 @@ import dotenv from "dotenv"
 dotenv.config();
 const ADMIN_SECRET_KEY = process.env.USER_SECRET;
 
-const adminauthenticate = async(req,res,next)=>{
+const customerAuthenticate = async(req,res,next)=>{
   
     const token = req.headers.authorization;
     if(!token){
@@ -17,7 +17,7 @@ const adminauthenticate = async(req,res,next)=>{
     try {
       const verifyToken = jwt.verify(cleanToken, ADMIN_SECRET_KEY);
 
-      console.log(verifyToken);
+      // console.log(verifyToken);
       
       const rootUser = await userDb.findOne({_id:verifyToken._id});
       
@@ -39,4 +39,4 @@ const adminauthenticate = async(req,res,next)=>{
     }
 } 
 
-export default adminauthenticate;
+export default customerAuthenticate;

@@ -1,4 +1,5 @@
 import Menu from "../../Model/Menu/menuSchema.js";
+import Orders from "../../Model/Orders/ordersSchema.js";
 
 export const addMenuItem = async (req, res) => {
   try {
@@ -53,3 +54,13 @@ export const updateMenuItem = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const getOrders = async(req,res)=>{
+  try {
+     const getAllOrders = await Orders.find({messCode:req.params.messCode}).populate("userId","name email");
+      res.status(200).json({message:"Orders fetched successfully",data:getAllOrders})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Failed to fetch orders" });
+  }
+}

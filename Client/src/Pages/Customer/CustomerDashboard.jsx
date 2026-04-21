@@ -4,7 +4,7 @@ import CartPage from "./Subpages/Cart/CartPage";
 import OrdersPage from "./Subpages/Order/OrdersPage";
 import ComplaintsPage from "./Subpages/Complaints/ComplaintsPage";
 import OverViewPage from "./Subpages/OverView/OverViewPage";
-import { useGetMenuItems } from "../../hooks/Admin/adminHooks";
+import { useGetMenuItems, usePlaceOrder } from "../../hooks/User/userHooks";
 import { jwtDecode } from "jwt-decode";
 
 /* ─────────────────────────────────────────────
@@ -94,17 +94,21 @@ export default function UserDashboard() {
   const [toast,      setToast]      = useState(null);
 
     const token = localStorage.getItem("login");
-   const decoded = jwtDecode(token);
-   const messCode = decoded.messCode;
-   console.log(messCode);
+   let decoded, messCode;
+   try {
+     decoded = jwtDecode(token);
+     messCode = decoded?.messCode;
+   } catch (error) {
+     console.error("Failed to decode token:", error);
+     messCode = null; // or some default
+   }
+
+   console.log(messCode)
 
   const { data: fetchedMenu = [], isLoading: menuLoading } = useGetMenuItems(messCode);
+  const { mutate: placeOrderMutation } = usePlaceOrder();
 
-  /* ── fetch menu ── */
-  useEffect(() => {
-    setMenu(fetchedMenu);
-    setLoading(menuLoading);
-  }, [fetchedMenu, menuLoading]);
+ 
 
   /* ── toast ── */
   const fire = (msg, type = "ok") => {
@@ -131,13 +135,14 @@ export default function UserDashboard() {
 const placeOrder = () => {
   if (!cartRows.length) return;
 
-  const id = `ORD-${Date.now().toString(36).toUpperCase()}`;
+  const id = decoded?._id || "UnknownUser";
   const now = new Date();
 
-  setOrders(prev => [
+  console.log("Placing order for user ID:", id);
+
+  let data = 
     {
-      id,
-      userId: decoded?._id,   // ✅ works now
+      userId: id,   // ✅ works now
       messCode: decoded?.messCode,
       items: cartRows.map(({ item, qty }) => ({
         name: item.name,
@@ -154,11 +159,14 @@ const placeOrder = () => {
         month: "short"
       }),
       status: "Confirmed",
-    },
-    ...prev
-  ]);
+      mealTime: cartRows[0].item.mealTime, // assuming all items are from the same meal time
+    }
 
-  console.log(orders)
+    console.log(data.items[0])
+  
+
+  placeOrderMutation(data);
+  console.log(data)
 
   setBalance(b => b + cartTotal);
   fire(`Order placed! ₹${cartTotal} added to balance.`);
@@ -183,16 +191,31 @@ const placeOrder = () => {
   };
 
   /* ── filtered + grouped menu ── */
-  const visible  = menu.filter(m => (mealFilter === "All" || m.mealTime === mealFilter) && (!vegOnly || m.isVeg));
-  const grouped  = MEAL_ORDER.reduce((acc, meal) => {
-    const items = visible.filter(m => m.mealTime === meal);
-    if (items.length) acc[meal] = items;
-    return acc;
-  }, {});
+const visible = menu.filter(m =>
+  (mealFilter === "All" ||
+   m.mealTime?.toLowerCase().trim() === mealFilter.toLowerCase()) &&
+  (!vegOnly || m.isVeg)
+);
+
+const grouped = MEAL_ORDER.reduce((acc, meal) => {
+  const items = visible.filter(
+    m => m.mealTime?.toLowerCase().trim() === meal.toLowerCase()
+  );
+
+  if (items.length) acc[meal] = items;
+  return acc;
+}, {});
 
   const today = new Date().toLocaleDateString("en-IN", {
     weekday:"long", day:"numeric", month:"long",
   });
+
+  useEffect(() => {
+  if (!menuLoading && fetchedMenu.length > 0) {
+    setMenu(fetchedMenu);
+    setLoading(false);
+  }
+}, [fetchedMenu, menuLoading]);
 
   /* ─────────────── NAV ITEMS ─────────────── */
   const NAV = [
@@ -351,7 +374,8 @@ const placeOrder = () => {
             VegBox={VegBox}
             cartCount={cartCount}
             cartTotal={cartTotal}
-            loading={loading}
+            loading={menuLoading}
+            setTab={setTab}
           />
         )}
 
@@ -366,6 +390,7 @@ const placeOrder = () => {
           clear={clear}
           VegBox={VegBox}
           IC={Ic}
+          setTab={setTab}
           />
         )}
 

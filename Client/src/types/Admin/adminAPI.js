@@ -17,3 +17,13 @@ export const getMenu = (messCode) => {
     }
   });
 }; 
+
+
+export const getOrders = (messCode) => {
+  const token = localStorage.getItem("login");
+  return api.get(`/admin/getOrders/${messCode}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}; 

@@ -5,6 +5,8 @@ import PaymentsPage from "./SubPages/Payments/PaymenntsPage";
 import NoticesPage from "./SubPages/Notice/NoticePage";
 import MenuPage from "./SubPages/Menu/MenuPage";
 import CustomersPage from "./SubPages/Customers/CustomersPage";
+import { useGetOrders } from "../../hooks/Admin/adminHooks";
+import { jwtDecode } from "jwt-decode";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -27,6 +29,12 @@ const ACCOUNT_NAV = [
 
 export default function MessDashboard() {
   const [page, setPage] = useState("overview");
+  const login = localStorage.getItem("login");
+  const decoded = jwtDecode(login);
+  const messCode = decoded.messCode;
+  const {data:getAllOrders} = useGetOrders(messCode)
+
+  console.log("getAllOrders:", getAllOrders);
 
   const pageTitle =
     page === "overview"  ? "Overview"
@@ -117,7 +125,7 @@ export default function MessDashboard() {
         {/* Page content */}
         <div className="p-7 pb-24 md:pb-24 pb-24 flex flex-col gap-5 overflow-y-auto md:px-7 px-4">
           {page === "overview"  && <OverviewPage setPage={setPage} />}
-          {page === "orders"    && <OrdersPage />}
+          {page === "orders"    && <OrdersPage orders={getAllOrders}/>}
           {page === "payments"  && <PaymentsPage />}
           {page === "notices"   && <NoticesPage />}
           {page === "menu"      && <MenuPage />}

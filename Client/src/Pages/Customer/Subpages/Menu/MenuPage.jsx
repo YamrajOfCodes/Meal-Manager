@@ -27,6 +27,9 @@ const MenuPage = ({
   const tabsRef = useRef(null)
   const sectionRefs = useRef({})
 
+
+  console.log(grouped)
+
   // Auto-scroll active tab into view
   useEffect(() => {
     if (!tabsRef.current) return

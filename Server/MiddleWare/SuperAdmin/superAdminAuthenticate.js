@@ -17,7 +17,7 @@ const adminauthenticate = async(req,res,next)=>{
     try {
       const verifyToken = jwt.verify(cleanToken, ADMIN_SECRET_KEY);
 
-      console.log(verifyToken);
+      // console.log(verifyToken);
       
       const rootUser = await userDb.findOne({_id:verifyToken._id});
       

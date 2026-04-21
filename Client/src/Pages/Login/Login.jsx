@@ -316,7 +316,7 @@ const handleLogin = () => {
             <div className="flex gap-2 mb-5">
               {[
                 { val: "owner", label: "Mess owner" },
-                { val: "user", label: "User" },
+                { val: "customer", label: "Customer" },
               ].map(({ val, label }) => (
                 <button
                   key={val}

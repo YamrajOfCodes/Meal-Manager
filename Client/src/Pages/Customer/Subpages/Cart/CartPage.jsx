@@ -1,7 +1,7 @@
 import React from 'react'
 import { Ic } from '../../CustomerDashboard'
 
-const CartPage = ({cartRows,cartCount,cartTotal,placeOrder,balance,clear,VegBox,IC}) => {
+const CartPage = ({cartRows,cartCount,cartTotal,placeOrder,balance,clear,VegBox,IC,setTab}) => {
   return (
     <div>
          <div className="slide max-w-lg mx-auto w-full flex flex-col gap-4">

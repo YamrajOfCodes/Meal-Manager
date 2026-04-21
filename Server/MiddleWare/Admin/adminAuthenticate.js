@@ -15,7 +15,7 @@ const adminauthenticate = async(req,res,next)=>{
     // Strip 'Bearer ' prefix if present
     const cleanToken = token.startsWith('Bearer ') ? token.slice(7) : token;
 
-    console.log(cleanToken)
+    // console.log(cleanToken)
     
     try {
       const verifyToken = jwt.verify(cleanToken, ADMIN_SECRET_KEY);
