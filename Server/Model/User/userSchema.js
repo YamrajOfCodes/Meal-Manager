@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     required:true
   },
 
+  payment:{
+    type:Number,
+  },
+
   city:{
     type:String,
     required:true

@@ -4,7 +4,7 @@ import CartPage from "./Subpages/Cart/CartPage";
 import OrdersPage from "./Subpages/Order/OrdersPage";
 import ComplaintsPage from "./Subpages/Complaints/ComplaintsPage";
 import OverViewPage from "./Subpages/OverView/OverViewPage";
-import { useGetMenuItems, usePlaceOrder } from "../../hooks/User/userHooks";
+import { useGetMenuItems, useGetMyOrders, usePlaceOrder } from "../../hooks/User/userHooks";
 import { jwtDecode } from "jwt-decode";
 
 /* ─────────────────────────────────────────────
@@ -107,6 +107,10 @@ export default function UserDashboard() {
 
   const { data: fetchedMenu = [], isLoading: menuLoading } = useGetMenuItems(messCode);
   const { mutate: placeOrderMutation } = usePlaceOrder();
+  const { data: myOrders = [] } = useGetMyOrders(decoded?._id);
+  const totalPrice = myOrders[0]?.userId?.payment || 0;
+
+  console.log(totalPrice);
 
  
 
@@ -167,11 +171,13 @@ const placeOrder = () => {
 
   placeOrderMutation(data);
   console.log(data)
+  setCart({});
 
   setBalance(b => b + cartTotal);
   fire(`Order placed! ₹${cartTotal} added to balance.`);
   setTab("orders");
 };
+
 
   /* ── complaint submit ── */
   const submitC = () => {
@@ -220,7 +226,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
   /* ─────────────── NAV ITEMS ─────────────── */
   const NAV = [
     { key:"home",       label:"Home",      d:"M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" },
-    { key:"menu",       label:"Order",     d:"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" },
+    { key:"menu",       label:"Menu",     d:"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" },
     { key:"cart",       label:"Cart",      d:["M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z","M3 6h18","M16 10a4 4 0 01-8 0"] },
     { key:"orders",     label:"Orders",    d:["M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z","M14 2v6h6","M16 13H8","M16 17H8","M10 9H8"] },
     { key:"complaints", label:"Help",      d:"M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" },
@@ -259,74 +265,194 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
       `}</style>
 
       {/* ════════════════ TOP BAR ════════════════ */}
-      <header className="bg-white border-b border-[#ebe6de] sticky top-0 z-40 flex items-stretch"
-        style={{minHeight:56}}>
+     {/* ════ DESKTOP HEADER ════ */}
+<header className="desk" style={{
+  position:"sticky", top:0, zIndex:40,
+  background:"#fff",
+  borderBottom:"1px solid #ece6de",
+  height:60,
+  display:"flex",
+  alignItems:"stretch",
+  fontFamily:"'DM Sans',sans-serif",
+}}>
 
-        {/* brand */}
-        <div className="flex items-center gap-3 px-5 border-r border-[#ebe6de] shrink-0">
-          <div className="w-8 h-8 rounded-[9px] bg-[#c2620a] flex items-center justify-center">
-            <Ic d="M3 11h18M3 7h18M7 3h10M5 11v8a2 2 0 002 2h10a2 2 0 002-2v-8" s={15} c="white" sw={2.4}/>
-          </div>
-          <div>
-            <p className="text-[14px] font-bold text-[#1c1812] leading-none">Patil Mess</p>
-            <p className="text-[10px] text-[#9a8f82] mt-0.5">OM01 · Pune</p>
-          </div>
-        </div>
+  {/* Brand */}
+  <div style={{
+    display:"flex", alignItems:"center", gap:11,
+    padding:"0 22px",
+    borderRight:"1px solid #ece6de",
+    flexShrink:0, minWidth:180,
+  }}>
+    <div style={{
+      width:34, height:34, borderRadius:9,
+      background:"#c2620a",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      flexShrink:0,
+    }}>
+      <Ic d="M3 11h18M3 7h18M7 3h10M5 11v8a2 2 0 002 2h10a2 2 0 002-2v-8"
+          s={16} c="white" sw={2.2}/>
+    </div>
+    <div>
+      <p style={{
+        fontFamily:"'Syne',sans-serif",
+        fontSize:15, fontWeight:600,
+        color:"#1a1410", letterSpacing:"-.02em",
+        lineHeight:1, margin:0,
+      }}>Patil Mess</p>
+      <div style={{display:"flex", alignItems:"center", gap:5, marginTop:3}}>
+        <span style={{
+          width:6, height:6, borderRadius:"50%",
+          background:"#16a34a", display:"inline-block",
+          animation:"pulse 2s ease infinite",
+        }}/>
+        {["OM01","Pune"].map(t => (
+          <span key={t} style={{
+            fontSize:9.5, fontWeight:500,
+            background:"#f3ede6", color:"#6b5f54",
+            padding:"1px 6px", borderRadius:100,
+          }}>{t}</span>
+        ))}
+      </div>
+    </div>
+  </div>
 
-        {/* desktop tabs */}
-        <nav className="desk flex" style={{flex:1}}>
-          {NAV.map(n => (
-            <button key={n.key}
-              className={`tab-d flex items-center gap-[7px] px-5 text-[13px] font-[500] cursor-pointer transition-all border-b-2 border-transparent relative ${tab===n.key?"tab-a":""}`}
-              style={{background:"none",border:"none",borderBottom: tab===n.key?"2px solid #c2620a":"2px solid transparent"}}
-              onClick={() => setTab(n.key)}>
-              <Ic d={n.d} s={14} c={tab===n.key?"#c2620a":"#9a8f82"} sw={1.9}/>
-              {n.label}
-              {n.key==="cart" && cartCount>0 && (
-                <span className="pop absolute -top-0.5 right-2 w-[18px] h-[18px] rounded-full bg-[#c0392b] text-white text-[9px] font-bold flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-              {n.key==="complaints" && complaints.filter(c=>c.status==="Open").length>0 && (
-                <span className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-red-500"/>
-              )}
-            </button>
-          ))}
-        </nav>
+  {/* Nav Tabs */}
+  <nav style={{display:"flex", alignItems:"stretch", flex:1, padding:"0 6px"}}>
+    {NAV.map(n => (
+      <button key={n.key}
+        onClick={() => setTab(n.key)}
+        style={{
+          display:"flex", alignItems:"center", gap:7,
+          padding:"0 16px",
+          fontSize:13,
+          fontWeight: tab===n.key ? 500 : 400,
+          color: tab===n.key ? "#c2620a" : "#b5a99e",
+          background:"none", border:"none",
+          borderBottom: tab===n.key ? "2px solid #c2620a" : "2px solid transparent",
+          cursor:"pointer",
+          transition:"color .15s",
+          position:"relative",
+          whiteSpace:"nowrap",
+          fontFamily:"'DM Sans',sans-serif",
+        }}>
+        {/* Icon pill */}
+        <span style={{
+          width:26, height:26, borderRadius:7,
+          display:"flex", alignItems:"center", justifyContent:"center",
+          background: tab===n.key ? "#fff4e8" : "transparent",
+          transition:"background .15s",
+          flexShrink:0,
+        }}>
+          <Ic d={n.d} s={14}
+            c={tab===n.key ? "#c2620a" : "#b5a99e"}
+            sw={tab===n.key ? 2.1 : 1.8}/>
+        </span>
+        {n.label}
+        {/* Cart badge */}
+        {n.key==="cart" && cartCount>0 && (
+          <span className="pop" style={{
+            position:"absolute", top:11, right:6,
+            minWidth:17, height:17, borderRadius:100,
+            background:"#dc2626", color:"#fff",
+            fontSize:9, fontWeight:600,
+            display:"flex", alignItems:"center", justifyContent:"center",
+            padding:"0 4px",
+          }}>{cartCount}</span>
+        )}
+        {/* Help dot */}
+        {n.key==="complaints" && complaints.filter(c=>c.status==="Open").length>0 && (
+          <span style={{
+            position:"absolute", top:13, right:9,
+            width:7, height:7, borderRadius:"50%",
+            background:"#dc2626",
+            border:"2px solid #fff",
+          }}/>
+        )}
+      </button>
+    ))}
+  </nav>
 
-        {/* right — balance + avatar */}
-        <div className="flex items-center gap-3 px-4 ml-auto">
-          {/* live balance chip */}
-          <div className="flex items-center gap-2 bg-[#fff4e8] border border-[#fde0bc] rounded-full px-3 py-[5px] cursor-pointer"
-            onClick={()=>setTab("orders")}>
-            <div className="w-[20px] h-[20px] rounded-full bg-[#c2620a] flex items-center justify-center">
-              <span className="text-white font-bold" style={{fontSize:9}}>₹</span>
-            </div>
-            <div>
-              <p className="text-[12px] font-bold text-[#c2620a] leading-none">
-                <CountUp value={balance}/>
-              </p>
-              <p className="text-[9px] text-[#c2620a] opacity-60 leading-none mt-0.5">due</p>
-            </div>
-          </div>
+  {/* Right Actions */}
+  <div style={{
+    display:"flex", alignItems:"center", gap:8,
+    padding:"0 16px",
+    borderLeft:"1px solid #ece6de",
+    flexShrink:0,
+  }}>
+    {/* Due chip */}
+    <div onClick={()=>setTab("orders")} style={{
+      display:"flex", alignItems:"center", gap:8,
+      padding:"6px 12px 6px 8px",
+      borderRadius:10,
+      border:"1px solid #fddcb5",
+      background:"#fff4e8",
+      cursor:"pointer",
+    }}>
+      <div style={{
+        width:26, height:26, borderRadius:7,
+        background:"#c2620a",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        flexShrink:0,
+      }}>
+        <Ic d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"
+            s={13} c="white" sw={2.2}/>
+      </div>
+      <div>
+        <p style={{fontSize:9.5, color:"#c2620a", opacity:.7, lineHeight:1, margin:0}}>
+          Amount Due
+        </p>
+        <p style={{
+          fontSize:13.5, fontWeight:600, color:"#c2620a",
+          lineHeight:1, margin:"2px 0 0",
+          fontFamily:"'Syne',sans-serif",
+        }}>
+          <CountUp value={totalPrice}/>
+        </p>
+      </div>
+    </div>
 
-          {/* cart shortcut */}
-          <button onClick={()=>setTab("cart")}
-            className="desk relative flex items-center gap-2 text-[12px] font-semibold px-4 py-2 rounded-full bg-[#c2620a] text-white hover:bg-[#a8520a] transition-colors">
-            <Ic d={["M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z","M3 6h18","M16 10a4 4 0 01-8 0"]} s={14} c="white"/>
-            Cart
-            {cartCount>0 && (
-              <span className="pop w-[18px] h-[18px] rounded-full bg-white text-[#c2620a] text-[9px] font-bold flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
-          </button>
+    {/* separator */}
+    <div style={{width:1, height:22, background:"#ece6de"}}/>
 
-          <div className="w-8 h-8 rounded-full bg-[#fde0bc] flex items-center justify-center text-[#c2620a] text-[11px] font-bold shrink-0">
-            RS
-          </div>
-        </div>
-      </header>
+    {/* Cart button */}
+    <button onClick={()=>setTab("cart")} style={{
+      display:"flex", alignItems:"center", gap:7,
+      padding:"8px 16px", borderRadius:10,
+      background:"#c2620a", color:"#fff",
+      fontSize:13, fontWeight:500,
+      border:"none", cursor:"pointer",
+      fontFamily:"'DM Sans',sans-serif",
+    }}>
+      <Ic d={["M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z","M3 6h18","M16 10a4 4 0 01-8 0"]}
+          s={14} c="white"/>
+      Cart
+      {cartCount>0 && (
+        <span className="pop" style={{
+          minWidth:18, height:18, borderRadius:100,
+          background:"#fff", color:"#c2620a",
+          fontSize:10, fontWeight:700,
+          display:"flex", alignItems:"center", justifyContent:"center",
+          padding:"0 4px",
+        }}>{cartCount}</span>
+      )}
+    </button>
+
+    {/* separator */}
+    <div style={{width:1, height:22, background:"#ece6de"}}/>
+
+    {/* Avatar */}
+    <div style={{
+      width:34, height:34, borderRadius:"50%",
+      background:"#f3ede6",
+      border:"1.5px solid #ece6de",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      fontSize:11, fontWeight:600, color:"#6b5f54",
+      cursor:"pointer",
+      fontFamily:"'Syne',sans-serif",
+      flexShrink:0,
+    }}>RS</div>
+  </div>
+</header>
 
       {/* ════════════════ TOAST ════════════════ */}
       {toast && (
@@ -347,7 +473,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
         {tab==="home" && (
           <OverViewPage
           balance={balance}
-          orders={orders}
+          orders={myOrders}
           complaints={complaints}
           today={today}
           setTab={setTab}
@@ -391,6 +517,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
           VegBox={VegBox}
           IC={Ic}
           setTab={setTab}
+          dec={dec}
           />
         )}
 
@@ -420,29 +547,66 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
       </main>
 
       {/* ════════════════ MOBILE BOTTOM NAV ════════════════ */}
-      <nav className="mob fixed bottom-0 left-0 right-0 bg-white border-t border-[#ebe6de] z-40"
-        style={{paddingBottom:"env(safe-area-inset-bottom,0)"}}>
-        <div className="flex">
-          {NAV.map(n=>(
-            <button key={n.key}
-              className={`flex-1 flex flex-col items-center gap-1 py-2.5 text-[9px] font-semibold uppercase tracking-wide transition-colors relative
-                ${tab===n.key?"text-[#c2620a]":"text-[#9a8f82]"}`}
-              style={{border:"none",background:"none",cursor:"pointer"}}
-              onClick={()=>setTab(n.key)}>
-              {n.key==="cart" && cartCount>0 && (
-                <span className="pop absolute top-1.5 right-[calc(50%-18px)] w-[17px] h-[17px] bg-[#c0392b] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-              {n.key==="complaints" && complaints.filter(c=>c.status==="Open").length>0 && tab!=="complaints" && (
-                <span className="absolute top-2 right-[calc(50%-14px)] w-1.5 h-1.5 rounded-full bg-red-500"/>
-              )}
-              <Ic d={n.d} s={21} c={tab===n.key?"#c2620a":"#9a8f82"} sw={tab===n.key?2.2:1.7}/>
-              {n.label}
-            </button>
-          ))}
-        </div>
-      </nav>
+      {/* ════ MOBILE BOTTOM NAV ════ */}
+<nav className="mob" style={{
+  position:"fixed", bottom:0, left:0, right:0,
+  background:"#fff",
+  borderTop:"1px solid #ece6de",
+  zIndex:40,
+  padding:`6px 8px calc(6px + env(safe-area-inset-bottom,0px))`,
+}}>
+  <div style={{
+    display:"flex", gap:2,
+    background:"#faf8f5",
+    borderRadius:14, padding:4,
+  }}>
+    {NAV.map(n => (
+      <button key={n.key}
+        onClick={() => setTab(n.key)}
+        style={{
+          flex:1,
+          display:"flex", flexDirection:"column", alignItems:"center", gap:3,
+          padding:"7px 4px",
+          borderRadius:10,
+          border:"none",
+          background: tab===n.key ? "#fff4e8" : "none",
+          cursor:"pointer",
+          transition:"background .15s",
+          position:"relative",
+          fontFamily:"'DM Sans',sans-serif",
+        }}>
+        {n.key==="cart" && cartCount>0 && (
+          <span className="pop" style={{
+            position:"absolute", top:4, right:"calc(50% - 18px)",
+            minWidth:15, height:15, borderRadius:100,
+            background:"#dc2626", color:"#fff",
+            fontSize:8.5, fontWeight:600,
+            display:"flex", alignItems:"center", justifyContent:"center",
+            padding:"0 3px",
+            border:"1.5px solid #fff",
+          }}>{cartCount}</span>
+        )}
+        {n.key==="complaints" && complaints.filter(c=>c.status==="Open").length>0 && tab!=="complaints" && (
+          <span style={{
+            position:"absolute", top:5, right:"calc(50% - 16px)",
+            width:7, height:7, borderRadius:"50%",
+            background:"#dc2626",
+            border:"1.5px solid #fff",
+          }}/>
+        )}
+        <Ic d={n.d} s={20}
+          c={tab===n.key ? "#c2620a" : "#b5a99e"}
+          sw={tab===n.key ? 2.1 : 1.7}/>
+        <span style={{
+          fontSize:9, fontWeight:500,
+          color: tab===n.key ? "#c2620a" : "#b5a99e",
+          letterSpacing:".03em",
+          textTransform:"uppercase",
+        }}>{n.label}</span>
+      </button>
+    ))}
+  </div>
+</nav>
     </div>
   );
 }

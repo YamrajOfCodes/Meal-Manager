@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMenu,placeAnOrder } from "../../types/User/userAPI";
+import { getMenu,placeAnOrder,getMyOrders } from "../../types/User/userAPI";
 import toast from "react-hot-toast";
 
 
@@ -21,18 +21,26 @@ import toast from "react-hot-toast";
     
   }
 
-  export const usePlaceOrder = ()=>{
-    const queryClient = useQueryClient();
-    return useMutation({ 
-    mutationFn: placeAnOrder,
-    mutationKey: ["placeOrder"],
-    onSuccess:()=>{
-        toast.success("Order placed successfully");
+// In userHooks.js — add onSuccess invalidation to usePlaceOrder
+export const usePlaceOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => placeAnOrder(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(["myOrders", variables.userId]);
+      queryClient.invalidateQueries(["menuItems"]);
     },
-    onError:()=>{
-        toast.error("Failed to place order");
-    }
+  });
+};
 
-     }
-)  }
+export const useGetMyOrders = (userId)=>{
+    return useQuery({
+        queryKey: ["myOrders", userId],
+        queryFn: () => getMyOrders(userId).then((response) => response.data.data),
+        enabled: !!userId,
+        onError: () => {
+          toast.error("Failed to fetch your orders");
+        },
+    });
+};
 

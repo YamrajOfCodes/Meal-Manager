@@ -31,7 +31,9 @@ export default function MessDashboard() {
   const [page, setPage] = useState("overview");
   const login = localStorage.getItem("login");
   const decoded = jwtDecode(login);
+  console.log("Login token:", decoded);
   const messCode = decoded.messCode;
+  console.log(messCode)
   const {data:getAllOrders} = useGetOrders(messCode)
 
   console.log("getAllOrders:", getAllOrders);

@@ -25,6 +25,7 @@ export const RegisterUser = async (req, res) => {
       city,
       messName,
       messCode,
+      payment:0,
       isactive: role === "owner" ? false : true
     });
 

@@ -21,3 +21,13 @@ export const placeAnOrder = (orderData) => {
     }
   });
 }; 
+
+export const getMyOrders = (userId) => {
+    const token = localStorage.getItem("login");
+    return api.get(`/user/getMyOrders/${userId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+}

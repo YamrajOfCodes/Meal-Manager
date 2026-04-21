@@ -31,10 +31,6 @@ let uid = 300;
 
 export default function MenuPage() {
 
-    const token = localStorage.getItem("login");
-   const decoded = jwtDecode(token);
-   const messCode = decoded.messCode;
-   console.log(messCode);
 
   const [tab, setTab]     = useState("Breakfast");
   const [modal, setModal] = useState(false);
@@ -42,21 +38,32 @@ export default function MenuPage() {
   const [times, setTimes] = useState({ ...SLOT_TIME });
   const [menu, setMenu] = useState({ Breakfast: [], Lunch: [], Dinner: [] });
   const { mutate: addMenuItems } = useAddMenuItem();
+  const [messCode, setMessCode] = useState(null);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
 
-  useEffect(() => {
-    const grouped = fetchedItems.reduce(
-      (acc, item) => {
-        const mealTime = item.mealTime || "Breakfast";
-        if (!acc[mealTime]) acc[mealTime] = [];
-        acc[mealTime].push(item);
-        return acc;
-      },
-      { Breakfast: [], Lunch: [], Dinner: [] }
-    );
 
-    setMenu(grouped);
-  }, [fetchedItems]);
+useEffect(() => {
+  const token = localStorage.getItem("login");
+  if (token) {
+    const decoded = jwtDecode(token);
+    setMessCode(decoded?.messCode);
+  }
+}, []);
+
+ useEffect(() => {
+  if (!fetchedItems.length) return;
+
+  const grouped = fetchedItems.reduce((acc, item) => {
+    const mealTime = item.mealTime || "Breakfast";
+    if (!acc[mealTime]) acc[mealTime] = [];
+    acc[mealTime].push(item);
+    return acc;
+  }, { Breakfast: [], Lunch: [], Dinner: [] });
+
+  setMenu(prev =>
+    JSON.stringify(prev) !== JSON.stringify(grouped) ? grouped : prev
+  );
+}, [fetchedItems]);
 
   console.log(menu)
 

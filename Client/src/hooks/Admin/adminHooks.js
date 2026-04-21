@@ -39,7 +39,7 @@ export const useAddMenuItem = () => {
       queryFn: () => getOrders(messCode).then((response) => response.data.data),
       enabled: !!messCode,
       onError: () => {
-        toast.error("Failed to fetch orders");
+        toast.error("Failed to fetch menu items");
       },
     });
   }
