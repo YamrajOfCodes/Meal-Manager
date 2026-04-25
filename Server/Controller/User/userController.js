@@ -1,6 +1,6 @@
 import Order from "../../Model/Orders/ordersSchema.js"
 import User from "../../Model/User/userSchema.js";
-
+import Complaint from "../../Model/Complaints/complaintSchema.js";
 
 export const PlaceOrder = async (req, res) => {
  
@@ -50,5 +50,44 @@ export const getMyOrders = async(req,res)=>{
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: "Failed to fetch orders" });
+    }
+}
+
+export const postComplaints = async (req, res) => {
+    try {
+        const { userId, messCode, desc, cat, status, date } = req.body;
+
+        if (!userId || !messCode || !desc || !date || !cat || !status) {
+            return res.status(400).json({ error: "all fields are required" });
+        }
+
+        const complaint = new Complaint({
+            userId,
+            category: cat,
+            details: desc,
+            messCode,
+            status,
+            date: new Date(date)
+        });
+
+        await complaint.save();
+
+        return res.status(200).json({ message: "Your voice is raised successfully" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Something went wrong" });
+    }
+};
+
+export const getAllComplaints = async(req,res)=>{
+
+    const {messCode} = req.params;
+    try {
+        const complaints = await Complaint.find({messCode});
+        return res.status(200).json({message:"complaints fetched successfully",data:complaints})
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({error:"something went wrong while getting complaints"})
     }
 }

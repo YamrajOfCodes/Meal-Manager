@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { addMenuItem,getMenu,getOrders } from "../../types/Admin/adminAPI";
+import { addMenuItem,getMenu,getOrders, postNotice,getNotices, deleteNotice} from "../../types/Admin/adminAPI";
 
 
 
@@ -42,4 +42,49 @@ export const useAddMenuItem = () => {
         toast.error("Failed to fetch menu items");
       },
     });
+  }
+
+  export const usePostNotice = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: postNotice,
+      mutationKey: ["notice"],
+    });
+
+    onSuccess: () => {
+      toast.success("Notice posted successfully");
+    }
+
+    onError: () => {
+      toast.error("Failed to post notice");
+    }
+  }
+
+  export const useGetNotices = (messCode) => {
+    return useQuery({
+      queryKey: ["notices", messCode],
+      queryFn:()=> getNotices(messCode).then((response)=> response.data.data)
+
+    })
+
+  }
+
+  export const deleteMotoceItem = ()=>{
+ 
+        const queryClient = useQueryClient();
+      
+        return useMutation({
+          mutationFn:deleteNotice,
+          mutationKey:["notices"],
+
+          onSuccess : ()=>{
+            toast.success("Notice is deleted successfully")
+          },
+
+          onError:()=>{
+            toast.error("please try again");
+          }
+        })
+  
   }

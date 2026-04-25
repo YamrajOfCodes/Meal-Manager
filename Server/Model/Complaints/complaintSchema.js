@@ -1,11 +1,19 @@
 import mongoose from "mongoose";
 
 const complaintSchema = new mongoose.Schema({
+    userId:{
+        type:String,
+        required:true
+    },
+    messCode:{
+        type:String,
+        required:true
+    },
     category:{
         type:String,
         required:true
     },
-    issueTitle:{
+    date:{
         type:String,
         required:true
     },
@@ -13,7 +21,7 @@ const complaintSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    priority:{
+    status:{
         type:String,
         required:true
     }

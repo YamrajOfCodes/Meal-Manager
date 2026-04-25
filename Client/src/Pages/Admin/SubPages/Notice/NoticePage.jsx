@@ -1,7 +1,19 @@
 import { useState } from "react";
 import { CardHead, CardWrap } from "../../../../components/AdminComponents/Shared/SharedComponents";
+import { useGetNotices, usePostNotice } from "../../../../hooks/Admin/adminHooks";
+import { jwtDecode } from "jwt-decode";
 
 function NoticesPage() {
+
+  const {mutate:postNoticess} = usePostNotice();
+  
+  const token = localStorage.getItem("login");
+  const decoded = jwtDecode(token);
+  const messCode = decoded?.messCode;
+  
+  const {data:getNotices} = useGetNotices(messCode);
+
+  console.log(getNotices)
 
   const NOTICES_INIT = [
   { id:1, text:"Lunch will be served at 1 PM tomorrow due to kitchen maintenance.", type:"info",    time:"Today 9:00 AM" },
@@ -17,11 +29,18 @@ const TYPE_META = {
 
   const [noticeText, setNoticeText] = useState("");
   const [noticeType, setNoticeType] = useState("info");
-  const [notices, setNotices] = useState(NOTICES_INIT);
+  const [notices, setNotices] = useState();
 
   const postNotice = () => {
     if (!noticeText.trim()) return;
-    setNotices([{ id: Date.now(), text: noticeText, type: noticeType, time: "Just now" }, ...notices]);
+    setNotices([{ id: Date.now(), text: noticeText, type: noticeType, time: "Just now" }]);
+
+   const data = {
+  text: notices?.[0]?.text || "",
+  type: notices?.[0]?.type || "",
+  messCode
+};
+    postNoticess(data)
     setNoticeText("");
   };
 
@@ -68,7 +87,7 @@ const TYPE_META = {
         </div>
 
         {/* Notices list */}
-        {notices.map(n => {
+        {getNotices?.map(n => {
           const m = TYPE_META[n.type] || TYPE_META.info;
           return (
             <div key={n.id} className="flex items-start gap-3 py-3 border-b border-[#e8e2d9] last:border-0">

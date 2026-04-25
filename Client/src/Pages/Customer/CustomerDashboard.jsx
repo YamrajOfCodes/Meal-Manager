@@ -4,8 +4,9 @@ import CartPage from "./Subpages/Cart/CartPage";
 import OrdersPage from "./Subpages/Order/OrdersPage";
 import ComplaintsPage from "./Subpages/Complaints/ComplaintsPage";
 import OverViewPage from "./Subpages/OverView/OverViewPage";
-import { useGetMenuItems, useGetMyOrders, usePlaceOrder } from "../../hooks/User/userHooks";
+import { useGetComplaints, useGetMenuItems, useGetMyOrders, usePlaceOrder, useRaiseComplaint } from "../../hooks/User/userHooks";
 import { jwtDecode } from "jwt-decode";
+import { useGetNotices } from "../../hooks/Admin/adminHooks";
 
 /* ─────────────────────────────────────────────
    MOCK API DATA  (matches your API shape exactly)
@@ -80,20 +81,9 @@ function VegBox({ isVeg }) {
    ROOT COMPONENT
 ═══════════════════════════════════════════════ */
 export default function UserDashboard() {
-  const [tab,        setTab]        = useState("home");
-  const [menu,       setMenu]       = useState([]);
-  const [loading,    setLoading]    = useState(true);
-  const [mealFilter, setMealFilter] = useState("All");
-  const [vegOnly,    setVegOnly]    = useState(false);
-  const [cart,       setCart]       = useState({});        // { _id: qty }
-  const [balance,    setBalance]    = useState(0);
-  const [orders,     setOrders]     = useState([]);
-  const [complaints, setComplaints] = useState([]);
-  const [cForm,      setCForm]      = useState({ cat:"", desc:"", orderId:"" });
-  const [cDone,      setCDone]      = useState(false);
-  const [toast,      setToast]      = useState(null);
 
-    const token = localStorage.getItem("login");
+
+   const token = localStorage.getItem("login");
    let decoded, messCode;
    try {
      decoded = jwtDecode(token);
@@ -103,14 +93,33 @@ export default function UserDashboard() {
      messCode = null; // or some default
    }
 
-   console.log(messCode)
+
+
+  const [tab,        setTab]        = useState("home");
+  const [menu,       setMenu]       = useState([]);
+  const [loading,    setLoading]    = useState(true);
+  const [mealFilter, setMealFilter] = useState("All");
+  const [vegOnly,    setVegOnly]    = useState(false);
+  const [cart,       setCart]       = useState({});        // { _id: qty }
+  const [balance,    setBalance]    = useState(0);
+  const [orders,     setOrders]     = useState([]);
+  // const [complaints, setComplaints] = useState([]);
+  const [cForm,      setCForm]      = useState({ cat:"", desc:"", messCode,date:new Date().toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }),status:"open",userId:decoded._id });
+  const [cDone,      setCDone]      = useState(false);
+  const [toast,      setToast]      = useState(null);
+
+   
+  //  console.log(messCode)
 
   const { data: fetchedMenu = [], isLoading: menuLoading } = useGetMenuItems(messCode);
+  const {data:complaints} = useGetComplaints(messCode);
   const { mutate: placeOrderMutation } = usePlaceOrder();
+  const {mutate:raiseComplaint} = useRaiseComplaint();
+  const {data:getNotices} = useGetNotices(messCode);
   const { data: myOrders = [] } = useGetMyOrders(decoded?._id);
   const totalPrice = myOrders[0]?.userId?.payment || 0;
 
-  console.log(totalPrice);
+  // console.log(complaintss);
 
  
 
@@ -142,7 +151,7 @@ const placeOrder = () => {
   const id = decoded?._id || "UnknownUser";
   const now = new Date();
 
-  console.log("Placing order for user ID:", id);
+  // console.log("Placing order for user ID:", id);
 
   let data = 
     {
@@ -166,11 +175,11 @@ const placeOrder = () => {
       mealTime: cartRows[0].item.mealTime, // assuming all items are from the same meal time
     }
 
-    console.log(data.items[0])
+    // console.log(data.items[0])
   
 
   placeOrderMutation(data);
-  console.log(data)
+  // console.log(data)
   setCart({});
 
   setBalance(b => b + cartTotal);
@@ -182,15 +191,16 @@ const placeOrder = () => {
   /* ── complaint submit ── */
   const submitC = () => {
     if (!cForm.cat || !cForm.desc.trim()) return;
-    setComplaints(prev => [{
-      id:      `CMP-${Date.now().toString(36).toUpperCase()}`,
-      cat:     cForm.cat,
-      desc:    cForm.desc,
-      orderId: cForm.orderId || "—",
-      date:    new Date().toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }),
-      status:  "Open",
-    }, ...prev]);
+    // setComplaints(prev => [{
+    //   userId:      decoded._id,
+    //   messCode:messCode,
+    //   cat:     cForm.cat,
+    //   desc:    cForm.desc,
+    //   date:    new Date().toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }),
+    //   status:  "Open",
+    // },]);
     setCForm({ cat:"", desc:"", orderId:"" });
+    raiseComplaint(cForm)
     setCDone(true);
     setTimeout(() => setCDone(false), 2500);
     fire("Complaint submitted. We'll respond within 24 hrs.", "info");
@@ -360,7 +370,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
           }}>{cartCount}</span>
         )}
         {/* Help dot */}
-        {n.key==="complaints" && complaints.filter(c=>c.status==="Open").length>0 && (
+        {n.key==="complaints" && complaints.filter(c=>c.status==="open").length>0 && (
           <span style={{
             position:"absolute", top:13, right:9,
             width:7, height:7, borderRadius:"50%",
@@ -485,6 +495,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
           vegOnly={vegOnly}
           VegBox={VegBox}
           cart={cart}
+          notices={getNotices}
           />
         )}
 
@@ -525,7 +536,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
         {tab==="orders" && (
          <OrdersPage
          balance={balance}
-         orders={orders}
+         orders={myOrders}
          CountUp={CountUp}
          />
         )}

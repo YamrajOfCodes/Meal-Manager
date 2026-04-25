@@ -31,3 +31,25 @@ export const getMyOrders = (userId) => {
     });
 
 }
+
+
+
+export const RaiseComplaint = (complaint) => {
+  const token = localStorage.getItem("login");
+  return api.post("/user/postcomplaint", complaint, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}; 
+
+
+export const getComplaints = (messCode) => {
+    const token = localStorage.getItem("login");
+    return api.get(`/user/getallcomplaints/${messCode}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+}

@@ -12,7 +12,8 @@ const OverViewPage = ({
     loading,
     menu,
     VegBox,
-    cart
+    cart,
+    notices
 }) => {
   return (
     <div>
@@ -95,11 +96,11 @@ const OverViewPage = ({
               <div className="card-hd">
                 <p className="font-semibold text-[14px] text-[#1c1812]">📢 Mess Notices</p>
               </div>
-              {[
-                { text:"Lunch will be served at 1:00 PM tomorrow — kitchen maintenance.", time:"Today 9:00 AM", t:"info" },
-                { text:"October fees due by 5th. Late payments attract ₹50 penalty.", time:"Yesterday 6 PM",   t:"pay"  },
-              ].map((n,i)=>(
-                <div key={i} className="flex gap-3 px-5 py-3.5 border-b border-[#ebe6de] last:border-0">
+               {
+                notices?.map((n,i)=>{
+                  return(
+                    <>
+                     <div key={i} className="flex gap-3 px-5 py-3.5 border-b border-[#ebe6de] last:border-0">
                   <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${n.t==="info"?"bg-[#e8f0fb]":"bg-[#fff4e8]"}`}>
                     <Ic d={n.t==="info"
                       ? "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
@@ -111,7 +112,10 @@ const OverViewPage = ({
                     <p className="text-[10px] text-[#9a8f82] mt-1">{n.time}</p>
                   </div>
                 </div>
-              ))}
+                    </>
+                  )
+                })
+               }
             </div>
           </div>
     </div>

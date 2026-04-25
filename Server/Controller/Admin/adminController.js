@@ -1,5 +1,6 @@
 import Menu from "../../Model/Menu/menuSchema.js";
 import Orders from "../../Model/Orders/ordersSchema.js";
+import Notice from "../../Model/Notice/noticeSchema.js";
 
 export const addMenuItem = async (req, res) => {
   try {
@@ -62,5 +63,40 @@ export const getOrders = async(req,res)=>{
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Failed to fetch orders" });
+  }
+}
+
+export const postNotice = async(req,res)=>{
+   try {
+      const {messCode, text, type,time} = req.body;
+      if(!messCode || !text || !type) return res.status(400).json({error:"messCode, text and type are required"});
+
+      const notice = await Notice.create({messCode, text, type,time});
+      return res.status(201).json({message:"Notice posted successfully",data:notice});
+
+   } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Failed to post notice" });
+   }
+}
+
+export const getNotices = async(req,res)=>{
+  try {
+     const getallNotices = await Notice.find({messCode:req.params.messCode}).sort({time:-1});
+     return res.status(200).json({message:"Notices fetched successfully",data:getallNotices});
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Failed to fetch notices" });
+  }
+}
+
+export const deleteNotice = async(req,res)=>{
+  try {
+     const notice = await Notice.findByIdAndDelete(req.params.id);
+     if(!notice) return res.status(404).json({message:"Notice not found"});
+     return res.status(200).json({message:"Notice deleted successfully"});
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Failed to delete notice" });
   }
 }

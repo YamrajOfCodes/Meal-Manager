@@ -9,7 +9,7 @@ export const useGetAllOwners = () => {
     queryKey: ['owners'],
     queryFn: getAllOwners,
     onSuccess: (data) => {
-      console.log('Owners fetched:', data);
+      // console.log('Owners fetched:', data);
       queryClient.invalidateQueries({ queryKey: ['owners'] });
     },
     onError: (error) => {
