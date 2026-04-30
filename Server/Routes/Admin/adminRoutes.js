@@ -9,7 +9,8 @@ import {
     deleteNotice,
     getNotices,
     postNotice,
-
+    getallUsers,
+    updateUserPayment
    } from "../../Controller/Admin/adminController.js";
 import adminauthenticate from "../../MiddleWare/Admin/adminAuthenticate.js";
 
@@ -24,6 +25,9 @@ router.get("/getOrders/:messCode",adminauthenticate,getOrders);
 router.post("/postNotice",adminauthenticate,postNotice);
 router.get("/getNotices/:messCode",getNotices);
 router.delete("/deleteNotice/:id",adminauthenticate,deleteNotice);
+
+router.get("/getallusers/:messCode",adminauthenticate,getallUsers);
+router.put("/updateUserPayment",adminauthenticate,updateUserPayment)
 
 
 

@@ -1,6 +1,7 @@
 import Menu from "../../Model/Menu/menuSchema.js";
 import Orders from "../../Model/Orders/ordersSchema.js";
 import Notice from "../../Model/Notice/noticeSchema.js";
+import User from "../../Model/User/userSchema.js"
 
 export const addMenuItem = async (req, res) => {
   try {
@@ -98,5 +99,51 @@ export const deleteNotice = async(req,res)=>{
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Failed to delete notice" });
+  }
+}
+
+export const getallUsers = async(req,res)=>{
+  try {
+    const {messCode} = req.params;
+    const getusers = await User.find({messCode,role:"customer"});
+    return res.status(200).json({message:"users fetched successfully",data:getusers})
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json(({error}))
+  }
+}
+
+export const updateUserPayment = async(req,res)=>{
+
+  console.log(req.body);
+
+  try {
+    const {userId,letestDue} = req.body;
+
+    if(!userId || !letestDue){
+      return res.status(400).json({error:"userId and updateDue both reuqired"});
+    }
+
+    const getUser = await User.findById({_id:userId});
+
+    console.log(getUser);
+   
+    let paid=0;
+
+    if(letestDue < getUser.payment){
+       paid = getUser.payment - letestDue
+    }else{
+       paid = letestDue - getUser.payment 
+    }
+
+    getUser.payment = letestDue;
+    getUser.paid = paid;
+    await getUser.save();
+    console.log(getUser);
+    return res.status(200).json({error:"user updated successfully"});
+
+  } catch (error) {
+    console.log(error)
+     return res.status(400).json({error:"something went wrong while updating user"});
   }
 }

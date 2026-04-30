@@ -205,13 +205,19 @@ const placeOrder = () => {
     setTimeout(() => setCDone(false), 2500);
     fire("Complaint submitted. We'll respond within 24 hrs.", "info");
   };
-
+  
   /* ── filtered + grouped menu ── */
-const visible = menu.filter(m =>
-  (mealFilter === "All" ||
-   m.mealTime?.toLowerCase().trim() === mealFilter.toLowerCase()) &&
-  (!vegOnly || m.isVeg)
-);
+const todays = new Date().toDateString();
+const visible = menu.filter(m => {
+  const isToday = new Date(m.createdAt).toDateString() === todays;
+
+  return (
+    isToday &&
+    (mealFilter === "All" ||
+      m.mealTime?.toLowerCase().trim() === mealFilter.toLowerCase()) &&
+    (!vegOnly || m.isVeg)
+  );
+});
 
 const grouped = MEAL_ORDER.reduce((acc, meal) => {
   const items = visible.filter(
@@ -370,7 +376,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
           }}>{cartCount}</span>
         )}
         {/* Help dot */}
-        {n.key==="complaints" && complaints.filter(c=>c.status==="open").length>0 && (
+        {n.key==="complaints" && complaints?.filter(c=>c.status==="open").length>0 && (
           <span style={{
             position:"absolute", top:13, right:9,
             width:7, height:7, borderRadius:"50%",
@@ -597,7 +603,7 @@ const grouped = MEAL_ORDER.reduce((acc, meal) => {
             border:"1.5px solid #fff",
           }}>{cartCount}</span>
         )}
-        {n.key==="complaints" && complaints.filter(c=>c.status==="Open").length>0 && tab!=="complaints" && (
+        {n.key==="complaints" && complaints?.filter(c=>c.status==="Open").length>0 && tab!=="complaints" && (
           <span style={{
             position:"absolute", top:5, right:"calc(50% - 16px)",
             width:7, height:7, borderRadius:"50%",

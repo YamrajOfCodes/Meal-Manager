@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema({
     type:Number,
   },
 
+  paid:{
+    type:Number,
+    default:0
+  },
+
   city:{
     type:String,
     required:true
@@ -43,6 +48,11 @@ const userSchema = new mongoose.Schema({
 
   messCode:{
    type:String
+  },
+
+  address:{
+    type:String,
+    required:true
   },
 
   isactive:{

@@ -53,12 +53,22 @@ useEffect(() => {
  useEffect(() => {
   if (!fetchedItems.length) return;
 
-  const grouped = fetchedItems.reduce((acc, item) => {
-    const mealTime = item.mealTime || "Breakfast";
-    if (!acc[mealTime]) acc[mealTime] = [];
-    acc[mealTime].push(item);
-    return acc;
-  }, { Breakfast: [], Lunch: [], Dinner: [] });
+ const today = new Date().toDateString();
+
+const grouped = fetchedItems.reduce((acc, item) => {
+  const itemDate = new Date(item.updatedAt).toDateString();
+
+  if (itemDate !== today) return acc; 
+
+  const mealTime = item.mealTime || "Breakfast";
+
+  if (!acc[mealTime]) acc[mealTime] = [];
+  acc[mealTime].push(item);
+
+  return acc;
+}, { Breakfast: [], Lunch: [], Snacks: [], Dinner: [] });
+
+  console.log(grouped)
 
   setMenu(prev =>
     JSON.stringify(prev) !== JSON.stringify(grouped) ? grouped : prev
@@ -67,9 +77,9 @@ useEffect(() => {
 
   console.log(menu)
 
-  const items    = menu[tab] || [];
-  const subtotal = items.reduce((a, i) => a + i.price, 0);
-  const dayTotal = Object.values(menu).flat().reduce((a, i) => a + i.price, 0);
+  const items    = menu?.[tab] || [];
+  const subtotal = items?.reduce((a, i) => a + i.price, 0);
+  const dayTotal = Object?.values(menu)?.flat()?.reduce((a, i) => a + i.price, 0);
 
 
   const openModal  = () => { setRows([{ name: "", price: "", isVeg: true }]); setModal(true); };

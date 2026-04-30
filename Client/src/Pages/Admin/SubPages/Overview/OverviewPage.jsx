@@ -2,7 +2,7 @@ import { CardHead, DueRow, MenuRow } from "../../../../components/AdminComponent
 import { CardWrap } from "../../../../components/AdminComponents/Shared/SharedComponents";
 import { ChipBadge } from "../../../../components/AdminComponents/Shared/SharedComponents";
 
-function OverviewPage({ setPage }) {
+function OverviewPage({ setPage,fetchedMenuItems,users,orders }) {
 
   const DUES = [
   { name:"Sneha Desai",    av:"SD", hue:"#7c3aed", since:"8 days",  amt:"₹1,800" },
@@ -16,6 +16,43 @@ const MENU = [
   { slot:"Snack",     dish:"Biscuits + Tea",               kcal:"150 kcal" },
   { slot:"Dinner",    dish:"Rajma · Rice · Salad",         kcal:"720 kcal" },
 ];
+
+
+ let yourCollection = 0;
+  let yettoRecieve  = 0;
+
+  users.forEach((element,index)=>{
+    yourCollection += element.paid;
+    yettoRecieve += element.payment
+  })
+
+
+let list = orders.filter((order) => {
+    return (
+      new Date(order.createdAt).toDateString() ===
+      new Date().toDateString()
+    );
+  });
+
+let totalOrdersPrice = list.reduce((acc,curr)=>{
+   acc += curr.price;
+   return acc;
+},0);
+
+  console.log(list)
+const today = new Date().toDateString();
+const grouped = fetchedMenuItems.reduce((acc, item) => {
+  const itemDate = new Date(item.updatedAt).toDateString();
+
+  if (itemDate !== today) return acc; 
+
+  const mealTime = item.mealTime || "Breakfast";
+  acc.push(item)
+
+  return acc;
+},[]);
+
+console.log(grouped)
 
 
   return (
@@ -45,9 +82,9 @@ const MENU = [
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
         {[
-          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2620a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>, iconBg:"#fff4e8", num:"₹8,640", label:"Today's collection",  chip:"chip-green", chipLabel:"+12% today" },
-          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>,       iconBg:"#fdecea",  num:"₹5,900", label:"Amount pending",     chip:"chip-red",   chipLabel:"3 customers" },
-          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f5a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M12 7a4 4 0 100 8 4 4 0 000-8z"/></svg>, iconBg:"#e8f5ef", num:"24",      label:"Active customers",   chip:"chip-blue",  chipLabel:"2 on leave" },
+          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2620a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>, iconBg:"#fff4e8", num:`₹${totalOrdersPrice}`, label:"Today's collection",  chip:"chip-green", chipLabel:"+12% today" },
+          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>,       iconBg:"#fdecea",  num:`₹${yettoRecieve}`, label:"Amount pending",     chip:"chip-red",   chipLabel:"3 customers" },
+          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f5a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M12 7a4 4 0 100 8 4 4 0 000-8z"/></svg>, iconBg:"#e8f5ef", num:users?.length,      label:"Active customers",   chip:"chip-blue",  chipLabel:"2 on leave" },
         ].map((k, i) => (
           <div key={i} className="bg-white border border-[#e8e2d9] rounded-[14px] p-[18px] shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -64,7 +101,7 @@ const MENU = [
 
       {/* Split: Monthly Collection + Dues */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4">
-        <CardWrap>
+        {/* <CardWrap>
           <CardHead title="Monthly Collection" sub="October 2025" />
           <div className="p-5">
             {[
@@ -87,27 +124,30 @@ const MENU = [
               </div>
             </div>
           </div>
-        </CardWrap>
+        </CardWrap> */}
 
         <CardWrap>
           <CardHead title="Payments Due" right={<ChipBadge type="chip-red">3 overdue</ChipBadge>} />
           <div className="px-4 pb-3 pt-1">
-            {DUES.map(d => (
-              <DueRow key={d.name} d={d} />
+            {users.map(due => (
+              <DueRow key={due.name} Due={due} />
             ))}
           </div>
         </CardWrap>
-      </div>
 
-      {/* Today's Menu preview */}
-      <CardWrap>
+
+         <CardWrap>
         <CardHead title="Today's Menu" right={
           <button className="text-[11px] font-semibold text-[#c2620a] cursor-pointer" onClick={() => setPage("menu")}>Edit menu →</button>
         } />
         <div className="px-5 pb-2 pt-1">
-          {MENU.map(m => <MenuRow key={m.slot} m={m} />)}
+          {grouped?.map(meal => <MenuRow key={meal.name} meal={meal} />)}
         </div>
       </CardWrap>
+      </div>
+
+      {/* Today's Menu preview */}
+     
     </div>
   );
 }

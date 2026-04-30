@@ -23,10 +23,10 @@ export const useLogin = () => {
       // 🔥 match your backend roles
       if (decoded.role === 'owner') {
         window.location.href="/admin"
-      } else if (decoded.role === 'student') {
-        window.location.href="/student"
+      } else if (decoded.role === 'customer') {
+        window.location.href="/customer"
       } else if (decoded.role === 'superadmin') {
-        // navigate('/super-admin');
+        navigate('/super-admin');
       }
 
       queryClient.invalidateQueries({ queryKey: ['me'] });

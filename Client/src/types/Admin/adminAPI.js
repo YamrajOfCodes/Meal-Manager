@@ -55,3 +55,23 @@ export const deleteNotice = (id) => {
     }
   });
 }
+
+
+export const getUsers = (messCode) => {
+  const token = localStorage.getItem("login");
+  return api.get(`/admin/getallusers/${messCode}`, {  
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+
+
+export const updateUserPayment = (data) => {
+  const token = localStorage.getItem("login");
+  return api.put(`/admin/updateUserPayment`,data,{  
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}

@@ -66,7 +66,7 @@ const OverViewPage = ({
                   chipLabel:"Today", chipCls:"bg-[#e8f0fb] text-[#1d5fa6]",
                 },
                 {
-                  label:"Open Complaints", val: complaints.filter(c=>c.status==="Open").length, sub:"Pending resolution",
+                  label:"Open Complaints", val: complaints?.filter(c=>c.status==="Open").length, sub:"Pending resolution",
                   iconD:"M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
                   iconBg:"bg-[#fdecea]", iconC:"#c0392b",
                   chipLabel:"Active", chipCls:"bg-[#fdecea] text-[#c0392b]",

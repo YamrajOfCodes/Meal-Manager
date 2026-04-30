@@ -5,7 +5,7 @@ import PaymentsPage from "./SubPages/Payments/PaymenntsPage";
 import NoticesPage from "./SubPages/Notice/NoticePage";
 import MenuPage from "./SubPages/Menu/MenuPage";
 import CustomersPage from "./SubPages/Customers/CustomersPage";
-import { useGetOrders } from "../../hooks/Admin/adminHooks";
+import { useGetMenuItems, useGetOrders, useGetUsers } from "../../hooks/Admin/adminHooks";
 import { jwtDecode } from "jwt-decode";
 import { useGetComplaints } from "../../hooks/User/userHooks";
 
@@ -37,8 +37,10 @@ export default function MessDashboard() {
   // console.log(messCode)
   const {data:getAllOrders} = useGetOrders(messCode)
   const {data:complaints} = useGetComplaints(messCode);
-
-  // console.log("getAllOrders:", getAllOrders);
+  const {data:getallUsers} = useGetUsers(messCode);
+  const { data: fetchedItems = [] } = useGetMenuItems(messCode);
+  
+  
 
   const pageTitle =
     page === "overview"  ? "Overview"
@@ -128,9 +130,9 @@ export default function MessDashboard() {
 
         {/* Page content */}
         <div className="p-7 pb-24 md:pb-24 pb-24 flex flex-col gap-5 overflow-y-auto md:px-7 px-4">
-          {page === "overview"  && <OverviewPage setPage={setPage} />}
+          {page === "overview"  && <OverviewPage setPage={setPage} fetchedMenuItems={fetchedItems} users={getallUsers} orders={getAllOrders} />}
           {page === "orders"    && <OrdersPage orders={getAllOrders}/>}
-          {page === "payments"  && <PaymentsPage />}
+          {page === "payments"  && <PaymentsPage users={getallUsers} />}
           {page === "notices"   && <NoticesPage />}
           {page === "menu"      && <MenuPage />}
           {(page === "customers" || page === "reports" || page === "settings") && (

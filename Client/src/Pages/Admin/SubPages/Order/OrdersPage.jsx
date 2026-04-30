@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
+import OrderRow from "../../../../components/AdminComponents/OrderRow/OrderRow";
 
 /* ─── tiny helpers ─── */
-const MEAL_EMOJI  = { Breakfast:"☀️", Lunch:"🍛", Snacks:"🫖", Dinner:"🌙" };
+const MEAL_EMOJI  = { Breakfast:"☀️", Lunch:"🍛", Dinner:"🌙" };
 const MEAL_COLOR  = {
   Breakfast: { bg:"#fff7ed", text:"#c2620a", dot:"#f97316" },
   Lunch:     { bg:"#f0fdf4", text:"#15803d", dot:"#22c55e" },
-  Snacks:    { bg:"#fefce8", text:"#a16207", dot:"#eab308" },
   Dinner:    { bg:"#eff6ff", text:"#1d4ed8", dot:"#3b82f6" },
 };
 
@@ -34,268 +34,6 @@ function nameHue(str="") {
   return h;
 }
 
-/* ─── Avatar ─── */
-function Avatar({ name }) {
-  const hue = nameHue(name);
-  return (
-    <div style={{
-      width:36, height:36, borderRadius:10, flexShrink:0,
-      background:`hsl(${hue},55%,92%)`,
-      color:`hsl(${hue},55%,38%)`,
-      display:"flex", alignItems:"center", justifyContent:"center",
-      fontSize:12, fontWeight:700, letterSpacing:.5,
-    }}>
-      {initials(name)}
-    </div>
-  );
-}
-
-/* ─── Meal pill ─── */
-function MealPill({ mealTime }) {
-  const c = MEAL_COLOR[mealTime] || { bg:"#f3f4f6", text:"#6b7280", dot:"#9ca3af" };
-  return (
-    <span style={{
-      display:"inline-flex", alignItems:"center", gap:5,
-      background:c.bg, color:c.text,
-      fontSize:11, fontWeight:600,
-      padding:"3px 9px", borderRadius:100,
-    }}>
-      <span style={{width:6,height:6,borderRadius:"50%",background:c.dot,flexShrink:0}}/>
-      {MEAL_EMOJI[mealTime] ?? "🍽"} {mealTime}
-    </span>
-  );
-}
-
-/* ─── Status badge ─── */
-function StatusBadge({ status }) {
-  const map = {
-    Confirmed: { bg:"#f0fdf4", text:"#15803d", label:"Confirmed" },
-    Pending:   { bg:"#fefce8", text:"#a16207", label:"Pending"   },
-    Cancelled: { bg:"#fef2f2", text:"#b91c1c", label:"Cancelled" },
-    Delivered: { bg:"#eff6ff", text:"#1d4ed8", label:"Delivered" },
-  };
-  const s = map[status] || { bg:"#f3f4f6", text:"#6b7280", label: status };
-  return (
-    <span style={{
-      background:s.bg, color:s.text,
-      fontSize:11, fontWeight:700,
-      padding:"3px 10px", borderRadius:100,
-      letterSpacing:.3,
-    }}>
-      {s.label}
-    </span>
-  );
-}
-
-/* ─── Expandable row for item details ─── */
-function OrderRow({ order, index }) {
-  const [open, setOpen] = useState(false);
-
-  /* support both shapes: order.items[] or single-item order */
-  const items = order.items ?? [{
-    name:     order.name,
-    price:    order.price,
-    mealTime: order.mealTime,
-    qty:      order.qty ?? 1,
-  }];
-
-  const total = items.reduce((s, it) => s + (it.price * (it.qty??1)), 0);
-  const user  = order.userId ?? {};
-  const userName  = user.name  ?? order.name ?? "—";
-  const userEmail = user.email ?? "—";
-
-  /* primary mealTime = first item's */
-  const primaryMeal = items[0]?.mealTime ?? "Lunch";
-
-  return (
-    <>
-      <tr
-        onClick={() => setOpen(o=>!o)}
-        style={{
-          cursor:"pointer",
-          borderBottom: open ? "none" : "1px solid #f0ebe3",
-          background: open ? "#fdf9f5" : "white",
-          transition:"background .15s",
-          animationDelay:`${index*40}ms`,
-        }}
-        className="order-row"
-      >
-        {/* # */}
-        <td style={{padding:"12px 16px", width:40}}>
-          <span style={{fontSize:11,color:"#c2b8a9",fontWeight:600}}>
-            {String(index+1).padStart(2,"0")}
-          </span>
-        </td>
-
-        {/* Customer */}
-        <td style={{padding:"12px 0"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <Avatar name={userName} />
-            <div>
-              <div style={{fontSize:13,fontWeight:700,color:"#1c1812",lineHeight:1.2}}>
-                {userName}
-              </div>
-              <div style={{fontSize:11,color:"#9a8f82",marginTop:2}}>
-                {userEmail}
-              </div>
-            </div>
-          </div>
-        </td>
-
-        {/* Meal */}
-        <td style={{padding:"12px 16px"}}>
-          <MealPill mealTime={primaryMeal}/>
-        </td>
-
-        {/* Item(s) */}
-        <td style={{padding:"12px 16px"}}>
-          {items.length === 1 ? (
-            <span style={{fontSize:13,color:"#1c1812",fontWeight:500}}>
-              {items[0].name}
-              {(items[0].qty??1) > 1 &&
-                <span style={{color:"#9a8f82",marginLeft:4}}>×{items[0].qty}</span>}
-            </span>
-          ) : (
-            <div style={{display:"flex",alignItems:"center",gap:6}}>
-              <span style={{fontSize:13,color:"#1c1812",fontWeight:500}}>
-                {items[0].name}
-              </span>
-              <span style={{
-                fontSize:10,fontWeight:700,
-                background:"#fde0bc",color:"#c2620a",
-                padding:"2px 6px",borderRadius:100
-              }}>
-                +{items.length-1} more
-              </span>
-            </div>
-          )}
-        </td>
-
-        {/* Amount */}
-        <td style={{padding:"12px 16px", textAlign:"right"}}>
-          <span style={{fontSize:14,fontWeight:800,color:"#1c1812",fontVariantNumeric:"tabular-nums"}}>
-            ₹{total}
-          </span>
-        </td>
-
-        {/* Status */}
-        <td style={{padding:"12px 16px"}}>
-          <StatusBadge status={order.status ?? "Confirmed"}/>
-        </td>
-
-        {/* Time */}
-        <td style={{padding:"12px 16px", textAlign:"right"}}>
-          <div style={{fontSize:12,color:"#1c1812",fontWeight:600}}>
-            {formatTime(order.createdAt)}
-          </div>
-          <div style={{fontSize:10,color:"#c2b8a9",marginTop:2}}>
-            {timeAgo(order.createdAt)}
-          </div>
-        </td>
-
-        {/* Expand chevron */}
-        <td style={{padding:"12px 14px 12px 4px", width:28}}>
-          <svg
-            width={14} height={14} viewBox="0 0 24 24" fill="none"
-            stroke="#c2b8a9" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"
-            style={{transform: open?"rotate(180deg)":"rotate(0deg)", transition:"transform .2s"}}
-          >
-            <path d="M6 9l6 6 6-6"/>
-          </svg>
-        </td>
-      </tr>
-
-      {/* ── Expanded detail panel ── */}
-      {open && (
-        <tr style={{background:"#fdf9f5", borderBottom:"1px solid #f0ebe3"}}>
-          <td colSpan={8} style={{padding:"0 16px 14px 16px"}}>
-            <div style={{
-              marginLeft:40+10+36, /* align under customer name */
-              display:"flex", flexDirection:"column", gap:10,
-            }}>
-              {/* items breakdown */}
-              <div style={{
-                background:"white", border:"1px solid #ede8e0",
-                borderRadius:10, overflow:"hidden",
-                fontSize:12,
-              }}>
-                <div style={{
-                  display:"grid",
-                  gridTemplateColumns:"1fr auto auto auto",
-                  padding:"8px 14px",
-                  borderBottom:"1px solid #f0ebe3",
-                  color:"#9a8f82", fontWeight:600, fontSize:11,
-                  letterSpacing:.4, textTransform:"uppercase",
-                }}>
-                  <span>Item</span>
-                  <span style={{textAlign:"center",minWidth:60}}>Meal</span>
-                  <span style={{textAlign:"center",minWidth:40}}>Qty</span>
-                  <span style={{textAlign:"right",minWidth:60}}>Price</span>
-                </div>
-                {items.map((it,i) => (
-                  <div key={i} style={{
-                    display:"grid",
-                    gridTemplateColumns:"1fr auto auto auto",
-                    padding:"9px 14px",
-                    borderBottom: i<items.length-1 ? "1px solid #f9f5f0" : "none",
-                    alignItems:"center",
-                  }}>
-                    <span style={{fontSize:13,fontWeight:600,color:"#1c1812"}}>{it.name}</span>
-                    <span style={{textAlign:"center",minWidth:60}}>
-                      <MealPill mealTime={it.mealTime??primaryMeal}/>
-                    </span>
-                    <span style={{textAlign:"center",minWidth:40,fontSize:13,color:"#5a5048",fontWeight:600}}>
-                      ×{it.qty??1}
-                    </span>
-                    <span style={{textAlign:"right",minWidth:60,fontWeight:700,color:"#1c1812",fontSize:13}}>
-                      ₹{it.price*(it.qty??1)}
-                    </span>
-                  </div>
-                ))}
-                {/* total row */}
-                <div style={{
-                  display:"grid",
-                  gridTemplateColumns:"1fr auto",
-                  padding:"9px 14px",
-                  background:"#faf7f3",
-                  borderTop:"1px solid #ede8e0",
-                }}>
-                  <span style={{fontSize:12,fontWeight:700,color:"#5a5048"}}>Total</span>
-                  <span style={{fontWeight:800,color:"#c2620a",fontSize:14}}>₹{total}</span>
-                </div>
-              </div>
-
-              {/* meta row */}
-              <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
-                {[
-                  { label:"Order ID", val: order._id?.slice(-8).toUpperCase() ?? "—" },
-                  { label:"Mess",     val: order.messCode ?? "—" },
-                  { label:"Placed",   val: new Date(order.createdAt).toLocaleString("en-IN",{
-                      day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"
-                    }) },
-                ].map(m => (
-                  <div key={m.label} style={{
-                    background:"white", border:"1px solid #ede8e0",
-                    borderRadius:8, padding:"7px 12px",
-                    display:"flex", flexDirection:"column", gap:2,
-                  }}>
-                    <span style={{fontSize:10,color:"#9a8f82",fontWeight:600,textTransform:"uppercase",letterSpacing:.4}}>
-                      {m.label}
-                    </span>
-                    <span style={{fontSize:12,fontWeight:700,color:"#1c1812"}}>
-                      {m.val}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </td>
-        </tr>
-      )}
-    </>
-  );
-}
-
 /* ════════════════════════════════════════════
    MAIN PAGE
 ════════════════════════════════════════════ */
@@ -306,63 +44,73 @@ function OrdersPage({ orders = [] }) {
   const [statusTab, setStatusTab] = useState("All");
   const [sortKey,   setSortKey]   = useState("time"); // time | amount | name
 
-  const meals   = ["All","Breakfast","Lunch","Snacks","Dinner"];
+  const meals   = ["All","Breakfast","Lunch","Dinner"];
   const statuses= ["All","Confirmed","Pending","Cancelled","Delivered"];
 
   /* ── derived stats ── */
-  const stats = useMemo(() => {
-    const total   = orders.length;
-    const revenue = orders.reduce((s,o) => {
-      const items = o.items ?? [{ price:o.price, qty:o.qty??1 }];
-      return s + items.reduce((ss,it)=>ss+it.price*(it.qty??1),0);
-    }, 0);
-    const byMeal = {};
-    orders.forEach(o => {
-      const m = (o.items?.[0]?.mealTime ?? o.mealTime) || "Other";
-      byMeal[m] = (byMeal[m]||0)+1;
-    });
-    const topMeal = Object.entries(byMeal).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? "—";
-    return { total, revenue, topMeal };
-  }, [orders]);
+ 
 
   /* ── filtered list ── */
-  const filtered = useMemo(() => {
-    let list = [...orders];
+;
+const filtered = useMemo(() => {
+  let list = orders.filter((order) => {
+    return (
+      new Date(order.createdAt).toDateString() ===
+      new Date().toDateString()
+    );
+  });
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(o =>
-        (o.userId?.name ?? o.name ?? "").toLowerCase().includes(q) ||
-        (o.userId?.email ?? "").toLowerCase().includes(q) ||
-        (o._id ?? "").toLowerCase().includes(q)
-      );
-    }
-    if (mealTab !== "All") {
-      list = list.filter(o =>
-        (o.items?.[0]?.mealTime ?? o.mealTime) === mealTab
-      );
-    }
-    if (statusTab !== "All") {
-      list = list.filter(o => (o.status ?? "Confirmed") === statusTab);
-    }
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    list = list.filter(o =>
+      (o.userId?.name ?? o.name ?? "").toLowerCase().includes(q) ||
+      (o.userId?.email ?? "").toLowerCase().includes(q) ||
+      (o._id ?? "").toLowerCase().includes(q)
+    );
+  }
 
-    list.sort((a,b) => {
-      if (sortKey === "time")   return new Date(b.createdAt)-new Date(a.createdAt);
-      if (sortKey === "amount") {
-        const tot = o => (o.items??[{price:o.price,qty:o.qty??1}])
-          .reduce((s,it)=>s+it.price*(it.qty??1),0);
-        return tot(b)-tot(a);
-      }
-      if (sortKey === "name") {
-        const na = (a.userId?.name??a.name??"").toLowerCase();
-        const nb = (b.userId?.name??b.name??"").toLowerCase();
-        return na.localeCompare(nb);
-      }
-      return 0;
+  if (mealTab !== "All") {
+    list = list.filter(o =>
+      (o.items?.[0]?.mealTime ?? o.mealTime) === mealTab
+    );
+  }
+
+  if (statusTab !== "All") {
+    list = list.filter(o => (o.status ?? "Confirmed") === statusTab);
+  }
+
+  return list;
+}, [orders, search, mealTab, statusTab]);
+
+const stats = useMemo(() => {
+  const total = filtered.length;
+
+  let revenue = 0;
+  const byMeal = {};
+  let topMeal = "—";
+  let maxCount = 0;
+
+  filtered.forEach((o) => {
+    const items = o.items ?? [{ price: o.price, qty: o.qty ?? 1 }];
+
+    // revenue
+    filtered.forEach((it) => {
+      revenue += it.price * (it.qty ?? 1);
     });
 
-    return list;
-  }, [orders, search, mealTab, statusTab, sortKey]);
+    // meal count
+    const meal = (o.items?.[0]?.mealTime ?? o.mealTime) || "Other";
+    byMeal[meal] = (byMeal[meal] || 0) + 1;
+
+    // track top meal without sorting
+    if (byMeal[meal] > maxCount) {
+      maxCount = byMeal[meal];
+      topMeal = meal;
+    }
+  });
+
+  return { total, revenue, topMeal };
+}, [filtered]);
 
   /* ── empty state ── */
   const isEmpty = filtered.length === 0;
@@ -423,7 +171,7 @@ function OrdersPage({ orders = [] }) {
           },
         ].map(s => (
           <div key={s.label} className="stat-card">
-            <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div className="grid grid-cols-1">
               <div style={{
                 width:34,height:34,borderRadius:9,
                 background:s.bg,display:"flex",

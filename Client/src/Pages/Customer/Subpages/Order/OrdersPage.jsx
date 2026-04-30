@@ -120,7 +120,7 @@ function CountUp({value,prefix="₹"}){
     requestAnimationFrame(r);
     p.current=value;
   },[value]);
-  return <>{prefix}{d.toLocaleString("en-IN")}</>;
+  return <>{prefix}{d?.toLocaleString("en-IN")}</>;
 }
 
 function StatCard({label,value,iconD,iconColor,iconBg}){
