@@ -1,5 +1,6 @@
 import User from "../../Model/User/userSchema.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const RegisterUser = async (req, res) => {
   try {
@@ -110,3 +111,38 @@ export const RegisterUser = async (req, res) => {
   }
 
   }
+
+
+export const logout = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.USER_SECRET);
+
+    // Find user by decoded id
+    const user = await User.findById(decoded._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Filter out the token
+    user.tokens = user.tokens.filter((element) => {
+      return element.token !== token;
+    });
+
+    await user.save();
+
+    return res.status(200).json({ message: "User is logged out" });
+
+  } catch (error) {
+    return res.status(500).json({ message: "Server error during logout" });
+  }
+};

@@ -8,6 +8,7 @@ import CustomersPage from "./SubPages/Customers/CustomersPage";
 import { useGetMenuItems, useGetOrders, useGetUsers } from "../../hooks/Admin/adminHooks";
 import { jwtDecode } from "jwt-decode";
 import { useGetComplaints } from "../../hooks/User/userHooks";
+import { useLogout } from "../../hooks/authHooks/authHooks";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -31,6 +32,7 @@ const ACCOUNT_NAV = [
 export default function MessDashboard() {
   const [page, setPage] = useState("overview");
   const login = localStorage.getItem("login");
+  const {mutate:logout} = useLogout();
   const decoded = jwtDecode(login);
   // console.log("Login token:", decoded);
   const messCode = decoded.messCode;
@@ -39,6 +41,11 @@ export default function MessDashboard() {
   const {data:complaints} = useGetComplaints(messCode);
   const {data:getallUsers} = useGetUsers(messCode);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
+
+  // Add this logout handler near the top of MessDashboard component (around line 44)
+const handleLogout = () => {
+ logout();
+};
   
   
 
@@ -95,13 +102,24 @@ export default function MessDashboard() {
         </nav>
 
         {/* Footer */}
-        <div className="mt-auto px-4 py-3.5 border-t border-[#e8e2d9] flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-[#fde8cc] flex items-center justify-center text-[11px] font-bold text-[#c2620a] flex-shrink-0">RP</div>
-          <div>
-            <div className="text-xs font-semibold text-[#1a1510]">Ramesh Patil</div>
-            <div className="text-[10px] text-[#9a8f82]">Owner</div>
-          </div>
-        </div>
+        <div className="mt-auto px-4 py-3.5 border-t border-[#e8e2d9]">
+  <div className="flex items-center gap-2.5">
+    <div className="w-8 h-8 rounded-full bg-[#fde8cc] flex items-center justify-center text-[11px] font-bold text-[#c2620a] flex-shrink-0">RP</div>
+    <div className="flex-1">
+      <div className="text-xs font-semibold text-[#1a1510]">Ramesh Patil</div>
+      <div className="text-[10px] text-[#9a8f82]">Owner</div>
+    </div>
+    <button
+      onClick={handleLogout}
+      title="Logout"
+      className="w-7 h-7 flex items-center justify-center rounded-[7px] hover:bg-red-50 text-[#9a8f82] hover:text-red-500 transition-colors border-none bg-transparent cursor-pointer"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+      </svg>
+    </button>
+  </div>
+</div>
       </aside>
 
       {/* ── Main content ── */}

@@ -5,6 +5,7 @@ import NoticePage from "./SubPages/Notice/NoticePage";
 import ComplaintsPage from "./SubPages/Complaint/ComplaintPage";
 import AnalyticsPage from "./SubPages/Analytics/AnalyticsPage";
 import { useGetAllOwners } from "../../hooks/SuperAdmin/superAdminHooks";
+import { useLogout } from "../../hooks/authHooks/authHooks";
 
 /* ─── seed data ─────────────────────────────────────────────────── */
 const OWNERS_INIT = [
@@ -40,6 +41,7 @@ const PAGE_TITLES = {
 export default function SuperAdminDashboard(){
   const [page,   setPage]   = useState("overview");
   const {data:getOwnersData,isPending} = useGetAllOwners();
+  const {mutate:logout} = useLogout();
   console.log(getOwnersData);
   const [owners, setOwners] = useState(OWNERS_INIT);
 
@@ -51,6 +53,11 @@ export default function SuperAdminDashboard(){
       setOwners(getOwnersData.data);
     }
   },[])
+
+
+const handleLogout = async () => {
+  logout();
+};
   
 
   return (
@@ -120,16 +127,25 @@ export default function SuperAdminDashboard(){
         </nav>
 
         {/* Footer */}
-        <div style={{ marginTop:"auto", padding:"14px 16px",
-          borderTop:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:10 }}>
-          <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(194,98,10,.3)",
-            display:"flex", alignItems:"center", justifyContent:"center",
-            fontSize:11, fontWeight:700, color:"#fbbf24", flexShrink:0 }}>SA</div>
-          <div>
-            <div style={{ fontSize:12, fontWeight:600, color:"#fff" }}>Super Admin</div>
-            <div style={{ fontSize:10, color:"rgba(255,255,255,.35)" }}>admin@tiffintrack.in</div>
-          </div>
-        </div>
+      <div className="mt-auto px-4 py-3.5 border-t border-white/10 flex items-center gap-2.5">
+  <div className="w-8 h-8 rounded-full bg-orange-900/30 flex items-center justify-center text-[11px] font-bold text-yellow-400 shrink-0">
+    SA
+  </div>
+  <div className="flex-1">
+    <div className="text-xs font-semibold text-white">Super Admin</div>
+    <div className="text-[10px] text-white/35">admin@tiffintrack.in</div>
+  </div>
+  <button
+    onClick={handleLogout}
+    title="Logout"
+    className="w-[30px] h-[30px] rounded-lg flex items-center justify-center bg-red-400/15 border border-red-400/25 hover:bg-red-400/25 transition-colors cursor-pointer"
+  >
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+      stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+    </svg>
+  </button>
+</div>
       </aside>
 
       {/* ── Main ── */}

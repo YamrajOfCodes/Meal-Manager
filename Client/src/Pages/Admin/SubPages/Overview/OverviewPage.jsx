@@ -21,20 +21,20 @@ const MENU = [
  let yourCollection = 0;
   let yettoRecieve  = 0;
 
-  users.forEach((element,index)=>{
+  users?.forEach((element,index)=>{
     yourCollection += element.paid;
     yettoRecieve += element.payment
   })
 
 
-let list = orders.filter((order) => {
+let list = orders?.filter((order) => {
     return (
       new Date(order.createdAt).toDateString() ===
       new Date().toDateString()
     );
   });
 
-let totalOrdersPrice = list.reduce((acc,curr)=>{
+let totalOrdersPrice = list?.reduce((acc,curr)=>{
    acc += curr.price;
    return acc;
 },0);
@@ -129,7 +129,7 @@ console.log(grouped)
         <CardWrap>
           <CardHead title="Payments Due" right={<ChipBadge type="chip-red">3 overdue</ChipBadge>} />
           <div className="px-4 pb-3 pt-1">
-            {users.map(due => (
+            {users?.map(due => (
               <DueRow key={due.name} Due={due} />
             ))}
           </div>
