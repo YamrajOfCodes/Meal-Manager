@@ -13,8 +13,11 @@ const OverViewPage = ({
     menu,
     VegBox,
     cart,
-    notices
+    notices,
+    totalPrice
 }) => {
+
+  console.log(complaints)
   return (
     <div>
       <div className="slide flex flex-col gap-5">
@@ -24,7 +27,7 @@ const OverViewPage = ({
               style={{background:"linear-gradient(120deg,#c2620a 0%,#e07b20 65%,#f0a050 100%)", padding:"24px 28px"}}>
               <div className="relative z-10">
                 <h1 className="text-2xl text-white font-bold leading-tight" style={{fontFamily:"'Lora',serif"}}>
-                  Good morning, Kundan 👋
+                  Good morning, Kundan
                 </h1>
                 <p className="text-white/70 text-[13px] mt-1">{today}</p>
                 <div className="flex gap-3 mt-4 flex-wrap">
@@ -42,16 +45,16 @@ const OverViewPage = ({
               <div className="absolute right-[-24px] top-[-24px] w-40 h-40 rounded-full bg-white/10 pointer-events-none"/>
               <div className="absolute right-[56px] bottom-[-48px] w-28 h-28 rounded-full bg-white/06 pointer-events-none"/>
               {/* floating balance */}
-              <div className="relative z-10 bg-white/18 border border-white/25 rounded-2xl px-5 py-4 text-center backdrop-blur shrink-0 desk">
+              <div className="relative z-10 bg-white/18 border border-white/25 rounded-2xl px-5 py-4 text-center backdrop-blur shrink-0">
                 <p className="text-[10px] text-white/60 uppercase tracking-wider font-semibold">Balance Due</p>
                 <p className="text-[28px] font-bold text-white leading-none mt-1">
-                  <CountUp value={balance}/>
+                  <CountUp value={totalPrice}/>
                 </p>
               </div>
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3  gap-4">
               {[
                 {
                   label:"Balance Due", val:<CountUp value={balance}/>, sub:"Total to pay this month",
@@ -66,7 +69,7 @@ const OverViewPage = ({
                   chipLabel:"Today", chipCls:"bg-[#e8f0fb] text-[#1d5fa6]",
                 },
                 {
-                  label:"Open Complaints", val: complaints?.filter(c=>c.status==="Open").length, sub:"Pending resolution",
+                  label:"Open Complaints", val: complaints?.filter(c=>c.status==="open").length, sub:"Pending resolution",
                   iconD:"M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
                   iconBg:"bg-[#fdecea]", iconC:"#c0392b",
                   chipLabel:"Active", chipCls:"bg-[#fdecea] text-[#c0392b]",

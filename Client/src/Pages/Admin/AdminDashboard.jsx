@@ -9,6 +9,8 @@ import { useGetMenuItems, useGetOrders, useGetUsers } from "../../hooks/Admin/ad
 import { jwtDecode } from "jwt-decode";
 import { useGetComplaints } from "../../hooks/User/userHooks";
 import { useLogout } from "../../hooks/authHooks/authHooks";
+import Complaints from "./SubPages/Complaints/Complaints";
+import AdminComplaintsPage from "./SubPages/Complaints/Complaints";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -21,6 +23,7 @@ const NAV = [
   { key:"payments",  label:"Payments", dot:true, icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
   { key:"notices",   label:"Notice",   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg> },
   { key:"menu",      label:"Menu",     icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg> },
+  { key:"complaints",label:"Complaints",     icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg> },
 ];
 
 const ACCOUNT_NAV = [
@@ -55,6 +58,7 @@ const handleLogout = () => {
     : page === "payments"? "Payments"
     : page === "notices" ? "Notice Board"
     : page === "menu"    ? "Today's Menu"
+    : page === "complaints"    ? "Complaints"
     : page.charAt(0).toUpperCase() + page.slice(1);
 
   return (
@@ -152,6 +156,7 @@ const handleLogout = () => {
           {page === "orders"    && <OrdersPage orders={getAllOrders}/>}
           {page === "payments"  && <PaymentsPage users={getallUsers} />}
           {page === "notices"   && <NoticesPage />}
+          {page === "complaints"&& <AdminComplaintsPage complaints={complaints} />}
           {page === "menu"      && <MenuPage />}
           {(page === "customers" || page === "reports" || page === "settings") && (
             <div className="flex items-center justify-center h-64 text-[#9a8f82] text-sm">

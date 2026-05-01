@@ -2,6 +2,7 @@ import Menu from "../../Model/Menu/menuSchema.js";
 import Orders from "../../Model/Orders/ordersSchema.js";
 import Notice from "../../Model/Notice/noticeSchema.js";
 import User from "../../Model/User/userSchema.js"
+import Complaint from "../../Model/Complaints/complaintSchema.js"
 
 export const addMenuItem = async (req, res) => {
   try {
@@ -145,5 +146,19 @@ export const updateUserPayment = async(req,res)=>{
   } catch (error) {
     console.log(error)
      return res.status(400).json({error:"something went wrong while updating user"});
+  }
+}
+
+export const updateComplaints = async(req,res)=>{
+  try {
+    const {complaintId,newStatus} = req.body;
+    const updateComplaint = await Complaint.findById(complaintId);
+    updateComplaint.status = newStatus;
+    await updateComplaint.save();
+    return res.status(200).json({message:"complaint resolved success",data:updateComplaint})
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({error});
   }
 }

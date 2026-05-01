@@ -10,7 +10,8 @@ import {
     getNotices,
     postNotice,
     getallUsers,
-    updateUserPayment
+    updateUserPayment,
+    updateComplaints
    } from "../../Controller/Admin/adminController.js";
 import adminauthenticate from "../../MiddleWare/Admin/adminAuthenticate.js";
 
@@ -28,6 +29,8 @@ router.delete("/deleteNotice/:id",adminauthenticate,deleteNotice);
 
 router.get("/getallusers/:messCode",adminauthenticate,getallUsers);
 router.put("/updateUserPayment",adminauthenticate,updateUserPayment)
+
+router.patch("/updateComplaint",adminauthenticate,updateComplaints);
 
 
 

@@ -75,3 +75,13 @@ export const updateUserPayment = (data) => {
     }
   });
 }
+
+
+export const updateComplaint = (data) => {
+  const token = localStorage.getItem("login");
+  return api.patch(`/admin/updateComplaint`,data,{  
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}

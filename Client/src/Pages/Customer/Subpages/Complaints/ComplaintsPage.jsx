@@ -1,6 +1,38 @@
 import React from 'react'
 
 const ComplaintsPage = ({complaints,COMPLAINT_CATS,cForm,cDone,submitC,setCForm,orders,Ic}) => {
+const catConfig = {
+  "Food Quality":    { bg:"#FCEBEB", iconColor:"#A32D2D", iconD:["M12 2a5 5 0 015 5v3H7V7a5 5 0 015-5z","M7 10h10l-1 10H8L7 10z"] },
+  "Late Delivery":   { bg:"#FAEEDA", iconColor:"#854F0B", iconD:"M12 2v10l4 4M22 12A10 10 0 112 12a10 10 0 0120 0z" },
+  "Quantity Issue":  { bg:"#E6F1FB", iconColor:"#185FA5", iconD:"M3 6h18M3 12h18M3 18h18" },
+  "Hygiene Concern": { bg:"#EAF3DE", iconColor:"#3B6D11", iconD:"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
+  "Wrong Item":      { bg:"#EEEDFE", iconColor:"#534AB7", iconD:["M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2","M21 12A9 9 0 113 12a9 9 0 0118 0z"] },
+  "Other":           { bg:"#F1EFE8", iconColor:"#5F5E5A", iconD:["M12 16h.01","M12 8v4","M22 12A10 10 0 112 12a10 10 0 0120 0z"] },
+};
+
+function Badge({ status }) {
+  const isOpen = status === "open";
+  return (
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 600,
+        padding: "3px 10px",
+        borderRadius: 99,
+        background: isOpen ? "#FCEBEB" : "#EAF3DE",
+        color: isOpen ? "#791F1F" : "#27500A",
+      }}
+    >
+      {isOpen ? "Open" : "Resolved"}
+    </span>
+  );
+}
+
+const fmt = iso => new Date(iso).toLocaleDateString("en-IN", {
+  day: "numeric", month: "short", year: "numeric"
+});
+
+
   return (
     <div>
        <div className="slide flex flex-col gap-5 max-w-2xl w-full mx-auto">
@@ -71,39 +103,30 @@ const ComplaintsPage = ({complaints,COMPLAINT_CATS,cForm,cDone,submitC,setCForm,
             </div>
 
             {/* complaint history */}
-            {complaints.length>0 && (
-              <div className="card overflow-hidden">
-                <div className="card-hd">
-                  <p className="font-semibold text-[14px] text-[#1c1812]">Your Complaints</p>
-                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#fdecea] text-[#c0392b]">
-                    {complaints.filter(c=>c.status==="Open").length} open
-                  </span>
-                </div>
-                <div>
-                  {complaints.map(c=>(
-                    <div key={c.id} className="flex gap-3 px-5 py-4 border-b border-[#ebe6de] last:border-0">
-                      <div className="w-9 h-9 rounded-xl bg-[#fdecea] flex items-center justify-center shrink-0 mt-0.5">
-                        <Ic d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" s={14} c="#c0392b"/>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-[13px] font-bold text-[#1c1812]">{c.cat}</span>
-                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${c.status==="Open"?"bg-[#fdecea] text-[#c0392b]":"bg-[#eaf5ef] text-[#1a7f5a]"}`}>
-                            {c.status}
-                          </span>
-                          <span className="text-[10px] text-[#9a8f82] font-mono">{c.id}</span>
-                        </div>
-                        <p className="text-[12px] text-[#5a5048] leading-relaxed">{c.desc}</p>
-                        <div className="flex items-center gap-3 mt-1.5 text-[10px] text-[#9a8f82]">
-                          <span>{c.date}</span>
-                          {c.orderId!=="—" && <span>· Order: {c.orderId}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {complaints.map(complaint => {
+  const cfg = catConfig[complaint.category] || catConfig["Other"];
+  return (
+    <div key={complaint.id} className='bg-white rounded-xl'  style={{ display:"flex", gap:12, padding:"14px 20px", borderBottom:"1px solid #ebe6de" }}>
+      <div style={{ width:36, height:36, borderRadius:10, background:cfg.bg, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+        <Ic d={cfg.iconD} s={14} c={cfg.iconColor} />
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", marginBottom:4 }}>
+          <span style={{ fontSize:13, fontWeight:600, color:"#1c1812" }}>{complaint.category}</span>
+          <Badge status={complaint.status} />
+        </div>
+        <p style={{ fontSize:12, color:"#5a5048", lineHeight:1.6 }}>{complaint.details}</p>
+        <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:8, fontSize:11, color:"#9a8f82" }}>
+          <span>{fmt(complaint.date)}</span>
+          <span>·</span>
+          <span>{complaint.messCode}</span>
+          <span>·</span>
+          <span style={{ fontFamily:"monospace" }}>{complaint.id}</span>
+        </div>
+      </div>
+    </div>
+  );
+})}
           </div>
     </div>
   )

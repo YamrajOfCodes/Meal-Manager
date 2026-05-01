@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { ClipboardList, Home, MessageCircle, ShoppingCart, UtensilsCrossed } from "lucide-react"
 import MenuPage from "./Subpages/Menu/MenuPage";
 import CartPage from "./Subpages/Cart/CartPage";
 import OrdersPage from "./Subpages/Order/OrdersPage";
@@ -89,6 +90,7 @@ export default function UserDashboard() {
   try {
     decoded = jwtDecode(token);
     messCode = decoded?.messCode;
+    console.log(decoded)
   } catch (error) {
     console.error("Failed to decode token:", error);
     messCode = null; // or some default
@@ -246,13 +248,13 @@ export default function UserDashboard() {
   }, [fetchedMenu, menuLoading]);
 
   /* ─────────────── NAV ITEMS ─────────────── */
-  const NAV = [
-    { key: "home", label: "Home", d: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" },
-    { key: "menu", label: "Menu", d: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" },
-    { key: "cart", label: "Cart", d: ["M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z", "M3 6h18", "M16 10a4 4 0 01-8 0"] },
-    { key: "orders", label: "Orders", d: ["M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z", "M14 2v6h6", "M16 13H8", "M16 17H8", "M10 9H8"] },
-    { key: "complaints", label: "Help", d: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" },
-  ];
+const NAV = [
+  { key: "home",       label: "Home",   Icon: Home },
+  { key: "menu",       label: "Menu",   Icon: UtensilsCrossed },
+  { key: "cart",       label: "Cart",   Icon: ShoppingCart },
+  { key: "orders",     label: "Orders", Icon: ClipboardList },
+  { key: "complaints", label: "Help",   Icon: MessageCircle },
+];
 
   /* ─────────────── RENDER ─────────────── */
   return (
@@ -365,9 +367,12 @@ export default function UserDashboard() {
                 transition: "background .15s",
                 flexShrink: 0,
               }}>
-                <Ic d={n.d} s={14}
-                  c={tab === n.key ? "#c2620a" : "#b5a99e"}
-                  sw={tab === n.key ? 2.1 : 1.8} />
+                <n.Icon
+                  size={15}
+                  strokeWidth={1.8}
+                   color={tab === n.key ? "#c2620a" : "#b5a99e"}
+                  
+                />
               </span>
               {n.label}
               {/* Cart badge */}
@@ -520,6 +525,7 @@ export default function UserDashboard() {
             VegBox={VegBox}
             cart={cart}
             notices={getNotices}
+            totalPrice={totalPrice}
           />
         )}
 
@@ -611,7 +617,7 @@ export default function UserDashboard() {
                 position: "relative",
                 fontFamily: "'DM Sans',sans-serif",
               }}>
-              {n.key === "cart" && cartCount > 0 && (
+              {/* {n.key === "cart" && cartCount > 0 && (
                 <span className="pop" style={{
                   position: "absolute", top: 4, right: "calc(50% - 18px)",
                   minWidth: 15, height: 15, borderRadius: 100,
@@ -621,7 +627,7 @@ export default function UserDashboard() {
                   padding: "0 3px",
                   border: "1.5px solid #fff",
                 }}>{cartCount}</span>
-              )}
+              )} */}
               {n.key === "complaints" && complaints?.filter(c => c.status === "Open").length > 0 && tab !== "complaints" && (
                 <span style={{
                   position: "absolute", top: 5, right: "calc(50% - 16px)",
@@ -630,9 +636,12 @@ export default function UserDashboard() {
                   border: "1.5px solid #fff",
                 }} />
               )}
-              <Ic d={n.d} s={20}
-                c={tab === n.key ? "#c2620a" : "#b5a99e"}
-                sw={tab === n.key ? 2.1 : 1.7} />
+              <n.Icon
+                  size={15}
+                  strokeWidth={1.8}
+                   color={tab === n.key ? "#c2620a" : "#b5a99e"}
+                  
+                />
               <span style={{
                 fontSize: 9, fontWeight: 500,
                 color: tab === n.key ? "#c2620a" : "#b5a99e",

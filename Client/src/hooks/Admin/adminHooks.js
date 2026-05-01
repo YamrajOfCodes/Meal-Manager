@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { addMenuItem,getMenu,getOrders, postNotice,getNotices, deleteNotice,getUsers,updateUserPayment} from "../../types/Admin/adminAPI";
+import { addMenuItem,getMenu,getOrders, postNotice,getNotices, deleteNotice,getUsers,updateUserPayment,updateComplaint} from "../../types/Admin/adminAPI";
 
 
 
@@ -117,6 +117,24 @@ export const useAddMenuItem = () => {
       toast.error("Failed to Update Payment");
     }
   }
+
+  export const useUpdateComplaint = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: updateComplaint,
+      mutationKey: ["users","complaint"],
+    });
+
+    onSuccess: () => {
+      toast.success("Complaint Updated successfully");
+    }
+
+    onError: () => {
+      toast.error("Failed to Update Payment");
+    }
+  }
+
 
 
 
