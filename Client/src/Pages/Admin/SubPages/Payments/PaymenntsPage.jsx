@@ -2,20 +2,22 @@ import { Edit } from "lucide-react";
 import { Avatar, CardHead, CardWrap, ChipBadge, DueRow, Pill } from "../../../../components/AdminComponents/Shared/SharedComponents";
 import { useState } from "react";
 import { useUpdatePayment } from "../../../../hooks/Admin/adminHooks";
+import Loader from "../../../../components/AdminComponents/Shared/Loader";
 
 function PaymentsPage({ users }) {
 
   console.log(users)
 
-  const {mutate:updatePayment} = useUpdatePayment();
+  const {mutate:updatePayment,isPending:isUpdating} = useUpdatePayment();
 
   const [editId, setEditId] = useState(null);
   const [editText, setEditText] = useState("");
+   const [loader,setLoader] = useState(false);
 
   let yourCollection = 0;
   let yettoRecieve  = 0;
 
-  users.forEach((element,index)=>{
+  users?.forEach((element,index)=>{
     yourCollection += element.paid;
     yettoRecieve += element.payment
   })
@@ -26,14 +28,24 @@ function PaymentsPage({ users }) {
   }
 
   const handleUpdate = () => {
-    let data = {
-      userId:editId,
-      letestDue:editText
-    } 
-    updatePayment(data);
-    setEditId(null);
-    setEditText("");
-  }
+  setLoader(true);
+
+  let data = {
+    userId: editId,
+    letestDue: editText
+  };
+
+  updatePayment(data, {
+    onSuccess: () => {
+      setLoader(false);
+      setEditId(null);
+      setEditText("");
+    },
+    onError: () => {
+      setLoading(false);
+    }
+  });
+};
 
   const handleCancel = () => {
     setEditId(null);
@@ -181,6 +193,12 @@ function PaymentsPage({ users }) {
           ))}
         </div>
       </CardWrap>
+
+     {loader && (
+  <div className="fixed inset-0 flex items-center justify-center bg-[#f6f3ef]/40 backdrop-blur-sm z-50">
+    <Loader />
+  </div>
+)}
     </div>
   );
 }

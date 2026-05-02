@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useUpdateComplaint } from "../../../../hooks/Admin/adminHooks";
+import Loader from "../../../../components/AdminComponents/Shared/Loader";
 
 // ── category visual config ───────────────────────────────────────
 const categoryConfig = {
@@ -73,11 +74,12 @@ function Dot() {
 export default function AdminComplaintsPage({complaints}) {
   const [activeFilter, setActiveFilter] = useState("all");
   const {mutate:updatecomplaint} = useUpdateComplaint();
-  const [loading, setLoading] = useState(true);
+  const [loader, setLoading] = useState(false);
 
 
   async function updateStatus(complaintId, newStatus) {
     // optimistic update — update UI immediately
+   setLoading(true)
 
     console.log(complaintId, newStatus)
 
@@ -86,7 +88,14 @@ export default function AdminComplaintsPage({complaints}) {
         newStatus
     }
 
-    updatecomplaint(data);
+      updatecomplaint(data,{
+      onSuccess:()=>{
+        setLoading(false)
+      },
+      onError: ()=>{
+        setLoading(false)
+      }
+    })
   
   }
 
@@ -217,6 +226,12 @@ export default function AdminComplaintsPage({complaints}) {
           )
         )}
       </div>
+
+        {loader && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[#f6f3ef]/40 backdrop-blur-sm z-50">
+          <Loader />
+        </div>
+      )}
     </div>
   );
 }

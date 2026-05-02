@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { useAddMenuItem, useGetMenuItems } from "../../../../hooks/Admin/adminHooks";
 import MenuModal from "../../../../components/AdminComponents/MenuModel/MenuModal";
 import MenuStat from "../../../../components/AdminComponents/MenuStats/MenuStat";
+import Loader from "../../../../components/AdminComponents/Shared/Loader";
 
 const INIT_MENU = {
   Breakfast: [
@@ -40,6 +41,7 @@ export default function MenuPage() {
   const { mutate: addMenuItems } = useAddMenuItem();
   const [messCode, setMessCode] = useState(null);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
+  const [loader,setLoader] = useState(false);
 
 
 useEffect(() => {
@@ -92,6 +94,7 @@ const grouped = fetchedItems.reduce((acc, item) => {
     );
 
   const save = () => {
+    setLoader(true);
     const valid = rows.filter((r) => r.name.trim());
     console.log(valid)
     if (!valid.length) return;
@@ -117,7 +120,15 @@ const grouped = fetchedItems.reduce((acc, item) => {
       mealTime: tab, 
     }
 
-    addMenuItems(data);
+    addMenuItems(data,{
+      onSuccess:()=>{
+        setLoader(false);
+      
+      },
+      onError:()=>{
+        setLoader(false);
+      }
+    });
 
     closeModal();
   };
@@ -286,6 +297,12 @@ const grouped = fetchedItems.reduce((acc, item) => {
       setRows={setRows}
       save={save}
        />
+      )}
+
+      {loader && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[#f6f3ef]/40 backdrop-blur-sm z-50">
+          <Loader />
+        </div>
       )}
     </div>
   );

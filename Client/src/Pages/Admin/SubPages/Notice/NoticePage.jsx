@@ -2,10 +2,13 @@ import { useState } from "react";
 import { CardHead, CardWrap } from "../../../../components/AdminComponents/Shared/SharedComponents";
 import { useGetNotices, usePostNotice } from "../../../../hooks/Admin/adminHooks";
 import { jwtDecode } from "jwt-decode";
+import Loader from "../../../../components/AdminComponents/Shared/Loader";
 
 function NoticesPage() {
 
   const {mutate:postNoticess} = usePostNotice();
+  const [loader,setLoader] = useState(false);
+
   
   const token = localStorage.getItem("login");
   const decoded = jwtDecode(token);
@@ -32,6 +35,7 @@ const TYPE_META = {
   const [notices, setNotices] = useState();
 
   const postNotice = () => {
+    setLoader(true)
     if (!noticeText.trim()) return;
     setNotices([{ id: Date.now(), text: noticeText, type: noticeType, time: "Just now" }]);
 
@@ -40,7 +44,14 @@ const TYPE_META = {
   type: notices?.[0]?.type || "",
   messCode
 };
-    postNoticess(data)
+    postNoticess(data,{
+      onSuccess:()=>{
+        setLoader(false)
+      },
+      onError: ()=>{
+        setLoader(false)
+      }
+    })
     setNoticeText("");
   };
 
@@ -107,6 +118,11 @@ const TYPE_META = {
           );
         })}
       </div>
+           {loader && (
+  <div className="fixed inset-0 flex items-center justify-center bg-[#f6f3ef]/40 backdrop-blur-sm z-50">
+    <Loader />
+  </div>
+)}
     </CardWrap>
   );
 }

@@ -11,6 +11,7 @@ import { useGetComplaints } from "../../hooks/User/userHooks";
 import { useLogout } from "../../hooks/authHooks/authHooks";
 import Complaints from "./SubPages/Complaints/Complaints";
 import AdminComplaintsPage from "./SubPages/Complaints/Complaints";
+import Loader from "../../components/AdminComponents/Shared/Loader";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -44,6 +45,9 @@ export default function MessDashboard() {
   const {data:complaints} = useGetComplaints(messCode);
   const {data:getallUsers} = useGetUsers(messCode);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
+  const [loader,setLoader] = useState(false);
+
+  console.log(loader);
 
   // Add this logout handler near the top of MessDashboard component (around line 44)
 const handleLogout = () => {
@@ -154,7 +158,7 @@ const handleLogout = () => {
         <div className="p-7 pb-24 md:pb-24 pb-24 flex flex-col gap-5 overflow-y-auto md:px-7 px-4">
           {page === "overview"  && <OverviewPage setPage={setPage} fetchedMenuItems={fetchedItems} users={getallUsers} orders={getAllOrders} />}
           {page === "orders"    && <OrdersPage orders={getAllOrders}/>}
-          {page === "payments"  && <PaymentsPage users={getallUsers} />}
+          {page === "payments"  && <PaymentsPage users={getallUsers} setLoading={setLoader} />}
           {page === "notices"   && <NoticesPage />}
           {page === "complaints"&& <AdminComplaintsPage complaints={complaints} />}
           {page === "menu"      && <MenuPage />}
@@ -186,6 +190,8 @@ const handleLogout = () => {
           ))}
         </div>
       </nav>
+
+    
     </div>
   );
 }
