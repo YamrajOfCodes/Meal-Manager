@@ -162,9 +162,10 @@ const handleLogout = () => {
           {page === "notices"   && <NoticesPage />}
           {page === "complaints"&& <AdminComplaintsPage complaints={complaints} />}
           {page === "menu"      && <MenuPage />}
+           {page === "customers"      && < CustomersPage users={getallUsers} />}
           {(page === "customers" || page === "reports" || page === "settings") && (
             <div className="flex items-center justify-center h-64 text-[#9a8f82] text-sm">
-              <CustomersPage/>
+              {/* <CustomersPage/> */}
             </div>
           )}
         </div>

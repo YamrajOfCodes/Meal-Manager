@@ -2,6 +2,7 @@ import React from 'react'
 import { Ic } from '../../CustomerDashboard'
 
 const CartPage = ({cartRows,cartCount,cartTotal,placeOrder,balance,clear,VegBox,IC,setTab,dec,inc}) => {
+  
   // console.log(cartRows);
   return (
     <div>

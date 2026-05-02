@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Loader from "../../../../components/AdminComponents/Shared/Loader";
 
 /* ─── TOKENS ─────────────────────────────────── */
 const T = {
@@ -149,6 +150,8 @@ export default function OrdersPage({ orders = MOCK, balance: balProp }) {
   const [sortCol, setSortCol] = useState("date");
   const [sortDir, setSortDir] = useState("desc");
   const [expanded, setExpanded] = useState(null);
+  const [loader,setLoader] = useState(false);
+
   const [page, setPage] = useState(1);
   const PER_PAGE = 8;
 
@@ -638,8 +641,13 @@ export default function OrdersPage({ orders = MOCK, balance: balProp }) {
             </div>
           )}
         </div>
-
       </div>
+
+        {loader && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[#f6f3ef]/40 backdrop-blur-sm z-50">
+          <Loader />
+        </div>
+      )}
     </>
   );
 }

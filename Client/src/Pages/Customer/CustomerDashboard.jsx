@@ -9,6 +9,7 @@ import { useGetComplaints, useGetMenuItems, useGetMyOrders, usePlaceOrder, useRa
 import { jwtDecode } from "jwt-decode";
 import { useGetNotices } from "../../hooks/Admin/adminHooks";
 import { useLogout } from "../../hooks/authHooks/authHooks";
+import Loader from "../../components/AdminComponents/Shared/Loader";
 
 /* ─────────────────────────────────────────────
    MOCK API DATA  (matches your API shape exactly)
@@ -122,6 +123,8 @@ export default function UserDashboard() {
   const { data: getNotices } = useGetNotices(messCode);
   const { data: myOrders = [] } = useGetMyOrders(decoded?._id);
   const totalPrice = myOrders[0]?.userId?.payment || 0;
+  const [loader,setLoader] = useState(false);
+
 
   // console.log(complaintss);
 
@@ -151,6 +154,8 @@ export default function UserDashboard() {
   /* ── place order ── */
   const placeOrder = () => {
     if (!cartRows.length) return;
+
+    setLoader(true);
 
     const id = decoded?._id || "UnknownUser";
     const now = new Date();
@@ -182,7 +187,15 @@ export default function UserDashboard() {
     // console.log(data.items[0])
 
 
-    placeOrderMutation(data);
+    placeOrderMutation(data,{
+      onSuccess:()=>{
+         setLoader(false);
+      },
+
+      onError:()=>{
+        setLoader(false);
+      }
+    });
     // console.log(data)
     setCart({});
 
@@ -204,7 +217,15 @@ export default function UserDashboard() {
     //   status:  "Open",
     // },]);
     setCForm({ cat: "", desc: "", orderId: "" });
-    raiseComplaint(cForm)
+    setLoader(true);
+    raiseComplaint(cForm,{
+      onSuccess:()=>{
+        setLoader(false);
+      },
+      onError:()=>{
+        setLoader(false);
+      }
+    })
     setCDone(true);
     setTimeout(() => setCDone(false), 2500);
     fire("Complaint submitted. We'll respond within 24 hrs.", "info");
@@ -672,6 +693,12 @@ const NAV = [
           </button>
         </div>
       </nav>
+
+      {loader && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[#f6f3ef]/40 backdrop-blur-sm z-50">
+          <Loader />
+        </div>
+      )}
     </div>
   );
 }

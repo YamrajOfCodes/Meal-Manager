@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ActionBtn, Avatar, Badge, Card, FieldLabel, InputRow, Modal, Toggle } from "../../../../components/SuperAdmin/Shared/SharedComponents";
 import { useDeleteMessOwner, useUpdateMessOwner, useUpdateMessStatus } from "../../../../hooks/SuperAdmin/superAdminHooks";
+import Loader from "../../../../components/AdminComponents/Shared/Loader";
 
 function OwnersPage({ owners, setOwners }){
 
@@ -24,6 +25,7 @@ function OwnersPage({ owners, setOwners }){
   const [editOwner, setEditOwner] = useState(null);
   const [deleteId,  setDeleteId]  = useState(null);
   const [form, setForm] = useState({});
+  const [loader,setLoader] = useState(false);
 
   const filtered = owners.filter(o=>{
     const q = search.toLowerCase();
@@ -38,7 +40,8 @@ function OwnersPage({ owners, setOwners }){
   });
 
   const toggleStatus = (id)=>{
-    console.log(owners?.[0]?.isactive)
+   
+    setLoader(true);
 
      let flagdata;
     if(owners?.[0]?.isactive==true){
@@ -51,17 +54,43 @@ function OwnersPage({ owners, setOwners }){
     ownerId:id, 
     newStatus:flagdata
   };
-  updateMessStatus(data);
+  updateMessStatus(data,{
+    onSuccess:()=>{
+      setLoader(false);
+    },
+
+    onError:()=>{
+      setLoader(false);
+    }
+  });
   }
   const openEdit     = o  => { setEditOwner(o); setForm({...o}); };
 
    const saveEdit = ()=>{
-     updateMessOwner(form);
+     setLoader(true);
+     updateMessOwner(form,{
+      onSuccess:()=>{
+      setLoader(false);
+    },
+
+    onError:()=>{
+      setLoader(false);
+    }
+     });
      setEditOwner(null);
    }
 
   const confirmDel   = () => { 
-    deleteMessOwner(deleteId);
+    setLoader(true);
+    deleteMessOwner(deleteId,{
+      onSuccess:()=>{
+      setLoader(false);
+    },
+
+    onError:()=>{
+      setLoader(false);
+    }
+    });
     setDeleteId(null);
    };
 
@@ -197,6 +226,12 @@ function OwnersPage({ owners, setOwners }){
           </button>
         </div>
       </Modal>
+
+         {loader && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[#f6f3ef]/40 backdrop-blur-sm z-50">
+          <Loader />
+        </div>
+      )}
     </div>
   );
 }
