@@ -3,6 +3,7 @@ import Orders from "../../Model/Orders/ordersSchema.js";
 import Notice from "../../Model/Notice/noticeSchema.js";
 import User from "../../Model/User/userSchema.js"
 import Complaint from "../../Model/Complaints/complaintSchema.js"
+import DiscountLabel  from "../../Model/Labels/DiscountLabelsSchema.js"
 
 export const addMenuItem = async (req, res) => {
   try {
@@ -159,6 +160,101 @@ export const updateComplaints = async(req,res)=>{
     
   } catch (error) {
     console.log(error);
+    return res.status(400).json({error});
+  }
+}
+
+export const createLabel = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const {
+      labelName,
+      tier,
+      discount,
+      minOrderValue,
+      description,
+    } = req.body;
+
+
+    if (!labelName) {
+      return res.status(400).json({ error: "Label name is required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+
+    const existing = await DiscountLabel.findOne({
+      userId,
+      labelName,
+    });
+
+    if (existing) {
+      return res.status(400).json({ error: "Label already exists" });
+    }
+
+    const label = new DiscountLabel({
+      userId,
+      labelName,
+      tier,
+      discount,
+      minOrderValue,
+      description,
+    });
+
+    await label.save();
+
+    return res.status(201).json({
+      message: "Label created successfully",
+      data: label,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
+};
+
+export const getallLables = async(req,res)=>{
+  try {
+    const getlabels = await DiscountLabel.find({});
+    return res.status(200).json(getlabels);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({error});
+  }
+}
+
+export const deleteLabel = async(req,res)=>{
+  try {
+    const {labelId} = req.params;
+    const deleteLabel = await DiscountLabel.findOneAndDelete(labelId);
+    if(deleteLabel){
+      return res.status(200).json({message:"label is deleted",data:deleteLabel})
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({error});
+  }
+}
+
+export const AssignLabel = async(req,res)=>{
+  try {
+    const {labelName,discount,userId} = req.body
+
+    const getUser = await User.findById(userId);
+    console.log(getUser);
+    getUser.label.labelName = labelName;
+    getuser.label.discount = discount;
+    await getuser.save();
+    return res.status(200).json("label is assigned");
+  } catch (error) {
+     console.log(error);
     return res.status(400).json({error});
   }
 }

@@ -1,6 +1,20 @@
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { addMenuItem, getMenu, getOrders, postNotice, getNotices, deleteNotice, getUsers, updateUserPayment, updateComplaint } from "../../types/Admin/adminAPI";
+import { 
+  addMenuItem, 
+  getMenu, 
+  getOrders, 
+  postNotice, 
+  getNotices, 
+  deleteNotice, 
+  getUsers, 
+  updateUserPayment, 
+  updateComplaint, 
+  createLabel,
+  getLabels,
+  deleteLabel,
+  AssignLabel
+} from "../../types/Admin/adminAPI";
 
 
 
@@ -140,6 +154,74 @@ export const useUpdateComplaint = () => {
 
  
 }
+
+
+export const useCreateLabel = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createLabel,
+
+    onSuccess: (_, variables) => {
+      toast.success("label successfully");
+      queryClient.invalidateQueries({ queryKey: ["label"] });
+    },
+
+    onError: () => {
+      toast.error("Failed to create label");
+    }
+  });
+};
+
+
+
+export const useGetLabels = () => {
+  return useQuery({
+    queryKey: ["label"],
+    queryFn: () => getLabels().then(res => res.data), 
+  });
+};
+
+export const useDeleteLabel = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteLabel,
+
+    onSuccess: (_, deletedId) => {
+      toast.success("label deleted successfully");
+
+      queryClient.setQueryData(["label"], (oldData) => {
+        return oldData?.filter(label => label._id !== deletedId);
+      });
+    },
+
+    onError: () => {
+      toast.error("Failed to delete label");
+    }
+  });
+};
+
+
+
+export const useAssignLabel = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: AssignLabel,
+
+    onSuccess: (_,) => {
+      toast.success("label assigned successfully");
+
+      queryClient.setQueryData(["label"]);
+    },
+
+    onError: () => {
+      toast.error("Failed to assign label");
+    }
+  });
+};
+
 
 
 

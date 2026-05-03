@@ -12,6 +12,7 @@ import { useLogout } from "../../hooks/authHooks/authHooks";
 import Complaints from "./SubPages/Complaints/Complaints";
 import AdminComplaintsPage from "./SubPages/Complaints/Complaints";
 import Loader from "../../components/AdminComponents/Shared/Loader";
+import LabelsPage from "./SubPages/Label/LabelsPage ";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -24,7 +25,24 @@ const NAV = [
   { key:"payments",  label:"Payments", dot:true, icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
   { key:"notices",   label:"Notice",   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg> },
   { key:"menu",      label:"Menu",     icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg> },
-  { key:"complaints",label:"Complaints",     icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg> },
+{ 
+  key: "complaints", 
+  label: "Complaints", 
+  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    <line x1="12" y1="8" x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+},
+{ 
+  key: "label", 
+  label: "Labels", 
+  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+    <line x1="7" y1="7" x2="7.01" y2="7"/>
+  </svg>
+},
+
 ];
 
 const ACCOUNT_NAV = [
@@ -63,6 +81,7 @@ const handleLogout = () => {
     : page === "notices" ? "Notice Board"
     : page === "menu"    ? "Today's Menu"
     : page === "complaints"    ? "Complaints"
+    : page === "label"    ? "Labels"
     : page.charAt(0).toUpperCase() + page.slice(1);
 
   return (
@@ -163,6 +182,7 @@ const handleLogout = () => {
           {page === "complaints"&& <AdminComplaintsPage complaints={complaints} />}
           {page === "menu"      && <MenuPage />}
            {page === "customers"      && < CustomersPage users={getallUsers} />}
+           {page === "label"      && < LabelsPage users={getallUsers}/>}
           {(page === "customers" || page === "reports" || page === "settings") && (
             <div className="flex items-center justify-center h-64 text-[#9a8f82] text-sm">
               {/* <CustomersPage/> */}

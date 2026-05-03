@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 
 export const RegisterUser = async (req, res) => {
   try {
-    const { name, email, password, phone, city, role, messName, messCode } = req.body;
+    const { name, email, password, phone, city, role, messName, messCode,address } = req.body;
 
-    if (!name || !email || !password || !phone || !city || !role) {
+    if (!name || !email || !password || !phone || !city || !role || !address) {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
 
@@ -20,6 +20,7 @@ export const RegisterUser = async (req, res) => {
     const newUser = new User({
       name,
       email,
+      address,
       password,
       phone,
       role,
@@ -27,6 +28,10 @@ export const RegisterUser = async (req, res) => {
       messName,
       messCode,
       payment:0,
+      label:{
+       labelName:"",
+       labelPrice:""
+      },
       isactive: role === "owner" ? false : true
     });
 

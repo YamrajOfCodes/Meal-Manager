@@ -11,7 +11,11 @@ import {
     postNotice,
     getallUsers,
     updateUserPayment,
-    updateComplaints
+    updateComplaints,
+    createLabel,
+    deleteLabel,
+    getallLables,
+    AssignLabel
    } from "../../Controller/Admin/adminController.js";
 import adminauthenticate from "../../MiddleWare/Admin/adminAuthenticate.js";
 
@@ -31,6 +35,13 @@ router.get("/getallusers/:messCode",adminauthenticate,getallUsers);
 router.put("/updateUserPayment",adminauthenticate,updateUserPayment)
 
 router.patch("/updateComplaint",adminauthenticate,updateComplaints);
+
+router.post("/createLabel/:userId",adminauthenticate,createLabel);
+router.get("/getlabel",adminauthenticate,getallLables);
+router.delete("/deleteLabel/:labelId",deleteLabel);
+
+router.put("/assignlabel",adminauthenticate,AssignLabel);
+
 
 
 

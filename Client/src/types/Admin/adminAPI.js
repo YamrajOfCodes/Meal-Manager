@@ -85,3 +85,44 @@ export const updateComplaint = (data) => {
     }
   });
 }
+
+export const createLabel = (data) => {
+  const token = localStorage.getItem("login");
+  return api.post(`/admin/createLabel/${data.userId}`,data,{  
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+
+
+export const getLabels = (messCode) => {
+  const token = localStorage.getItem("login");
+  return api.get(`/admin/getlabel`, {  
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+
+
+
+export const deleteLabel = (labelId) => {
+  const token = localStorage.getItem("login");
+  return api.delete(`/admin/deleteLabel/${labelId}`, {  
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+
+
+export const AssignLabel = (data) => {
+  const token = localStorage.getItem("login");
+  return api.put(`/admin/assignlabel`, data,{  
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+

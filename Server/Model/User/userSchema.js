@@ -59,6 +59,16 @@ const userSchema = new mongoose.Schema({
     type:Boolean
   },
 
+ label: {
+  labelName: {
+    type: String,
+    trim: true,
+  },
+  labelPrice: {
+    type: Number,
+  },
+},
+
   role: {
     type: String,
     enum: ["superadmin", "owner", "customer"],

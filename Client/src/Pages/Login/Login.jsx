@@ -128,6 +128,7 @@ const registerOwnerFields = [
   { id: "messName", label: "Mess name", type: "text", ph: "Shree Sai Mess" },
   { id: "messCode", label: "Mess code", type: "text", ph: "Choose a unique code" },
   { id: "city", label: "City", type: "text", ph: "Enter your city" },
+  { id: "address", label: "Address", type: "text", ph: "Enter your address" },
 
 ];
 
@@ -138,6 +139,7 @@ const registerUserFields = [
   { id: "password", label: "Password", type: "password", ph: "••••••••" },
   { id: "city", label: "City", type: "text", ph: "Enter your city" },
   { id: "messCode", label: "Mess code", type: "text", ph: "Code from your mess owner" },
+  { id: "address", label: "Address", type: "text", ph: "Enter your address" },
 ];
 
 const stats = [
@@ -276,7 +278,7 @@ const handleLogin = () => {
 
       {/* ══════════ RIGHT PANEL ══════════ */}
 
-     <div className="flex w-[440px] items-center justify-center min-h-screen bg-stone-100 px-4">
+     <div className="flex w-full md:w-[440px] items-center justify-center min-h-screen bg-stone-100 px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl border border-stone-200 overflow-hidden">
 
         {/* Top accent bar */}
