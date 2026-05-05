@@ -8,7 +8,7 @@ import CustomersPage from "./SubPages/Customers/CustomersPage";
 import { useGetMenuItems, useGetOrders, useGetUsers } from "../../hooks/Admin/adminHooks";
 import { jwtDecode } from "jwt-decode";
 import { useGetComplaints } from "../../hooks/User/userHooks";
-import { useLogout } from "../../hooks/authHooks/authHooks";
+import { useGetUserData, useLogout } from "../../hooks/authHooks/authHooks";
 import Complaints from "./SubPages/Complaints/Complaints";
 import AdminComplaintsPage from "./SubPages/Complaints/Complaints";
 import Loader from "../../components/AdminComponents/Shared/Loader";
@@ -63,9 +63,10 @@ export default function MessDashboard() {
   const {data:complaints} = useGetComplaints(messCode);
   const {data:getallUsers} = useGetUsers(messCode);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
+  const {data:ownerData} = useGetUserData(decoded._id);
   const [loader,setLoader] = useState(false);
 
-  console.log(loader);
+  console.log("ownerData",ownerData);
 
   // Add this logout handler near the top of MessDashboard component (around line 44)
 const handleLogout = () => {
@@ -106,8 +107,7 @@ const handleLogout = () => {
         {/* Mess selector */}
         <div className="mx-3.5 my-3 bg-[#faf8f5] border border-[#e8e2d9] rounded-[9px] px-3 py-2.5 cursor-pointer flex items-center justify-between hover:border-[#d4ccc0] transition-colors">
           <div>
-            <div className="text-xs font-semibold text-[#1a1510]">Patil Mess</div>
-            <div className="text-[10px] text-[#9a8f82] mt-0.5">Pune · 24 customers</div>
+            <div className="text-xs font-semibold text-[#1a1510]">{ownerData?.messName}</div>
           </div>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9a8f82" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </div>
@@ -131,10 +131,10 @@ const handleLogout = () => {
         {/* Footer */}
         <div className="mt-auto px-4 py-3.5 border-t border-[#e8e2d9]">
   <div className="flex items-center gap-2.5">
-    <div className="w-8 h-8 rounded-full bg-[#fde8cc] flex items-center justify-center text-[11px] font-bold text-[#c2620a] flex-shrink-0">RP</div>
+    <div className="w-8 h-8 rounded-full bg-[#fde8cc] flex items-center justify-center text-[11px] font-bold text-[#c2620a] flex-shrink-0">{ownerData?.name.slice(0,2)}</div>
     <div className="flex-1">
-      <div className="text-xs font-semibold text-[#1a1510]">Ramesh Patil</div>
-      <div className="text-[10px] text-[#9a8f82]">Owner</div>
+      <div className="text-xs font-semibold text-[#1a1510]">{ownerData?.name}</div>
+      <div className="text-[10px] text-[#9a8f82]">{ownerData?.role}</div>
     </div>
     <button
       onClick={handleLogout}

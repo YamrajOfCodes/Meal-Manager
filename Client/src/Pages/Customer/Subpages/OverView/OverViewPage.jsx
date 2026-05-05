@@ -14,10 +14,10 @@ const OverViewPage = ({
     VegBox,
     cart,
     notices,
-    totalPrice
+    totalPrice,
+    user
 }) => {
 
-  console.log(complaints)
   return (
     <div>
       <div className="slide flex flex-col gap-5">
@@ -27,7 +27,7 @@ const OverViewPage = ({
               style={{background:"linear-gradient(120deg,#c2620a 0%,#e07b20 65%,#f0a050 100%)", padding:"24px 28px"}}>
               <div className="relative z-10">
                 <h1 className="text-2xl text-white font-bold leading-tight" style={{fontFamily:"'Lora',serif"}}>
-                  Good morning, Kundan
+                  Hello, {user}
                 </h1>
                 <p className="text-white/70 text-[13px] mt-1">{today}</p>
                 <div className="flex gap-3 mt-4 flex-wrap">

@@ -10,6 +10,23 @@ export const RegisterUser = async (req, res) => {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
 
+    if(phone.length < 10 || phone.length>10){
+      return res.status(400).json({error:"please enter invalid phone number"});
+    }
+    if (role == "customer") {
+      const findMessCode = await User.findOne({
+        role: "owner",
+        messCode,
+      });
+      if (!findMessCode) {
+        return res.status(400).json({ error: "invalid mess Code" });
+      }
+
+          console.log(findMessCode);
+    }
+
+
+
     const existingUser = await User.findOne({ email });
     const existingMob  = await User.findOne({phone});
 

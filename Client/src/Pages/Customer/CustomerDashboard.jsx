@@ -118,7 +118,7 @@ export default function UserDashboard() {
   const { mutate: logout } = useLogout();
   const {data:usersdata} = useGetUserData(decoded._id);
 
-  console.log("usersdata",usersdata);
+
 
   const { data: fetchedMenu = [], isLoading: menuLoading } = useGetMenuItems(messCode);
   const { data: complaints } = useGetComplaints(messCode);
@@ -377,14 +377,14 @@ const NAV = [
               fontSize: 15, fontWeight: 600,
               color: "#1a1410", letterSpacing: "-.02em",
               lineHeight: 1, margin: 0,
-            }}>Patil Mess</p>
+            }}>{usersdata?.name}</p>
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 3 }}>
               <span style={{
                 width: 6, height: 6, borderRadius: "50%",
                 background: "#16a34a", display: "inline-block",
                 animation: "pulse 2s ease infinite",
               }} />
-              {["OM01", "Pune"].map(t => (
+              {[usersdata?.messCode, usersdata?.address].map(t => (
                 <span key={t} style={{
                   fontSize: 9.5, fontWeight: 500,
                   background: "#f3ede6", color: "#6b5f54",
@@ -533,7 +533,7 @@ const NAV = [
               fontSize: 11, fontWeight: 600, color: "#6b5f54",
               fontFamily: "'Syne',sans-serif",
               flexShrink: 0,
-            }}>RS</div>
+            }}>{usersdata?.name?.toUpperCase()?.slice(0,2)}</div>
 
             <button onClick={handleLogout} title="Logout" style={{
               width: 34, height: 34, borderRadius: 9,
@@ -581,6 +581,7 @@ const NAV = [
             cart={cart}
             notices={getNotices}
             totalPrice={totalPrice}
+            user={usersdata?.name}
           />
         )}
 

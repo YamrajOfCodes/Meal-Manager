@@ -38,7 +38,7 @@ router.put("/updateUserPayment",adminauthenticate,updateUserPayment)
 router.patch("/updateComplaint",adminauthenticate,updateComplaints);
 
 router.post("/createLabel/:userId",adminauthenticate,createLabel);
-router.get("/getlabel",adminauthenticate,getallLables);
+router.get("/getlabel/:userId",adminauthenticate,getallLables);
 router.delete("/deleteLabel/:labelId",deleteLabel);
 
 router.put("/assignlabel",adminauthenticate,AssignLabel);

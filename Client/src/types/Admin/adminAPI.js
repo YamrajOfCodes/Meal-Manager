@@ -96,9 +96,9 @@ export const createLabel = (data) => {
 }
 
 
-export const getLabels = (messCode) => {
+export const getLabels = (userId) => {
   const token = localStorage.getItem("login");
-  return api.get(`/admin/getlabel`, {  
+  return api.get(`/admin/getlabel/${userId}`, {  
     headers: {
       Authorization: `Bearer ${token}`
     }

@@ -34,12 +34,17 @@ let list = orders?.filter((order) => {
     );
   });
 
+  console.log(list);
+
 let totalOrdersPrice = list?.reduce((acc,curr)=>{
+  console.log(curr);
    acc += curr.price;
    return acc;
 },0);
 
-  console.log(list)
+  
+
+  console.log(totalOrdersPrice)
 const today = new Date().toDateString();
 const grouped = fetchedMenuItems.reduce((acc, item) => {
   const itemDate = new Date(item.updatedAt).toDateString();

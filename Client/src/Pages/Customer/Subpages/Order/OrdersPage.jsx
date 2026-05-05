@@ -156,8 +156,9 @@ export default function OrdersPage({ orders = MOCK, balance: balProp }) {
   const PER_PAGE = 8;
 
   const user = orders[0]?.userId ?? {};
-  // console.log(user)
+
   const balance = user?.payment;
+  console.log(balance)
   const totalSpent = orders?.reduce((s, o) => s + o.price, 0);
   const thisWeek = orders?.filter(o => (Date.now() - new Date(o.createdAt)) < 7 * 86400000).length;
   const avgOrder = orders?.length ? Math.round(totalSpent / orders.length) : 0;
@@ -370,7 +371,7 @@ export default function OrdersPage({ orders = MOCK, balance: balProp }) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: T.t3, textTransform: "uppercase", letterSpacing: "0.09em" }}>Amount Due</p>
                 <p style={{ fontSize: 38, fontWeight: 800, color: T.brand, lineHeight: 1, marginTop: 5, letterSpacing: "-0.03em" }}>
-                  <CountUp value={balance} />
+                  <CountUp value={balance || "0"} />
                 </p>
                 <p style={{ fontSize: 12, color: T.t3, marginTop: 5 }}>{orders.length} order{orders.length !== 1 ? "s" : ""} placed</p>
               </div>

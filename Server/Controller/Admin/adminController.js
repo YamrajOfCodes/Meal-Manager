@@ -115,41 +115,46 @@ export const getallUsers = async(req,res)=>{
   }
 }
 
-export const updateUserPayment = async(req,res)=>{
+export const updateUserPayment = async (req, res) => {
 
-  console.log(req.body);
-
+  console.log(req.body)
   try {
-    const {userId,letestDue} = req.body;
+    const { userId,  letestDue } = req.body;
 
-    if(!userId || !letestDue){
-      return res.status(400).json({error:"userId and updateDue both reuqired"});
+    if (!userId || !letestDue ) {
+      return res.status(400).json({
+        error: "userId and latestDue are required",
+      });
     }
 
-    const getUser = await User.findById({_id:userId});
+    const user = await User.findById(userId);
 
-    console.log(getUser);
-   
-    let paid=0;
-
-    if(letestDue < getUser.payment){
-       paid = getUser.payment - letestDue
-    }else{
-       paid = letestDue - getUser.payment 
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found",
+      });
     }
 
-    getUser.payment = letestDue;
-    getUser.paid = paid;
-    await getUser.save();
-    console.log(getUser);
-    return res.status(200).json({error:"user updated successfully"});
+    const paid = Math.abs(user.payment - letestDue);
+
+    user.payment = letestDue;
+    user.paid += paid; // if cumulative
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      user,
+    });
 
   } catch (error) {
-    console.log(error)
-     return res.status(400).json({error:"something went wrong while updating user"});
-  }
-}
+    console.log(error);
 
+    return res.status(500).json({
+      error: "Something went wrong while updating user",
+    });
+  }
+};
 export const updateComplaints = async(req,res)=>{
   try {
     const {complaintId,newStatus} = req.body;
@@ -222,7 +227,8 @@ export const createLabel = async (req, res) => {
 
 export const getallLables = async(req,res)=>{
   try {
-    const getlabels = await DiscountLabel.find({});
+    const {userId} = req.params;
+    const getlabels = await DiscountLabel.findOne({_id:userId});
     return res.status(200).json(getlabels);
   } catch (error) {
     console.log(error);

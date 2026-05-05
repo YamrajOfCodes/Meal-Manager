@@ -196,17 +196,33 @@ export default function TiffinTrackSignIn() {
 const update = (k, v) => setForm({ ...form, [k]: v });
 
 const handleLogin = () => {
-  const payload = { ...form, role };  // build complete object synchronously
+  const payload = { ...form, role };
 
   setLoading(true);
-  setTimeout(() => setLoading(false), 1800);
 
-  mode === "login" ? login(payload) : register(payload);
-  console.log(payload); // this will also log correctly now
-
-  if(isRegisterSuccess){
-    setMode("login");
-    setForm({ email: form.email, password: form.password }); // pre-fill login form with registered email and password
+  if (mode === "login") {
+    login(payload, {
+      onSuccess: () => {
+        setLoading(false);
+      },
+      onError: () => {
+        setLoading(false);
+      },
+    });
+  } else {
+    register(payload, {
+      onSuccess: () => {
+        setLoading(false);
+        setMode("login");
+        setForm({
+          email: form.email,
+          password: form.password,
+        });
+      },
+      onError: () => {
+        setLoading(false);
+      },
+    });
   }
 };
 

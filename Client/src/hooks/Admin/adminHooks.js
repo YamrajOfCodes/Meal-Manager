@@ -176,10 +176,10 @@ export const useCreateLabel = () => {
 
 
 
-export const useGetLabels = () => {
+export const useGetLabels = (userId) => {
   return useQuery({
-    queryKey: ["label"],
-    queryFn: () => getLabels().then(res => res.data), 
+    queryKey: ["label",userId],
+    queryFn: () => getLabels(userId).then(res => res.data), 
   });
 };
 

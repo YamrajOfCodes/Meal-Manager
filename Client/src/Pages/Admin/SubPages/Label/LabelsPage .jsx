@@ -244,22 +244,22 @@ export default function Discountgetlabels({users}) {
   const [form, setForm] = useState({ name: "", tier: "basic", discount: "", minOrder: "", desc: "" });
   const [assignSelected, setAssignSelected] = useState([]);
   const {mutate:createLabel} = useCreateLabel();
-  const {data:getlabels} = useGetLabels();
   const {mutate:deleteLabel} = useDeleteLabel();
   const {mutate:assigneLabel} = useAssignLabel();
   const {mutate:unassignedLabel} = useunAssignLabel();
   const [labelss,setLabels] = useState(null);
   const [assigned,setAssigned] = useState([])
   console.log(users)
-
+  
   const token = localStorage.getItem("login");
   const decoded = jwtDecode(token);
   const [unassignedId,setUnassignedId] = useState(null);
-
+  
   const totalAssigned = () => {
     
   };
-
+  const {data:getlabels} = useGetLabels(decoded?._id);
+  
   const maxDiscount = getlabels?.length ? Math.max(...getlabels.map(l => l.discount)) : 0;
 
   const handleCreate = () => {
