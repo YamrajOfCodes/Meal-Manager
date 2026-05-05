@@ -22,7 +22,8 @@ const MenuPage = ({
   inc,
   dec,
   loading,
-  setTab
+  setTab,
+  loginUser
 }) => {
   const tabsRef = useRef(null)
   const sectionRefs = useRef({})
@@ -124,6 +125,7 @@ const MenuPage = ({
               dec={dec}
               VegBox={VegBox}
               sectionRefs={sectionRefs}
+              discount = {loginUser?.label?.labelPrice}
             />
           ))
         )}
@@ -152,7 +154,7 @@ const MenuPage = ({
 }
 
 /* ── Meal section ── */
-const MealSection = ({ meal, items, emoji, timeLabel, cart, inc, dec, VegBox, sectionRefs }) => (
+const MealSection = ({ meal, items, emoji, timeLabel, cart, inc, dec, VegBox, sectionRefs,discount }) => (
   <div
     ref={el => sectionRefs.current[meal] = el}
     className="bg-white rounded-2xl overflow-hidden border border-[#ede8e0]"
@@ -191,7 +193,7 @@ const MealSection = ({ meal, items, emoji, timeLabel, cart, inc, dec, VegBox, se
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <p className="text-[14px] font-bold text-[#1c1812]">₹{item.price}</p>
+            <p className="text-[14px] font-bold text-[#1c1812]">₹{ discount ? item.price - discount : item.price}</p>
 
             {qty === 0 ? (
               <button

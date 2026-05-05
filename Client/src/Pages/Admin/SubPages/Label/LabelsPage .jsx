@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAssignLabel, useCreateLabel, useDeleteLabel, useGetLabels } from "../../../../hooks/Admin/adminHooks";
+import { useAssignLabel, useCreateLabel, useDeleteLabel, useGetLabels, useunAssignLabel } from "../../../../hooks/Admin/adminHooks";
 import {jwtDecode} from "jwt-decode"
 
 const CUSTOMERS = [
@@ -247,12 +247,14 @@ export default function Discountgetlabels({users}) {
   const {data:getlabels} = useGetLabels();
   const {mutate:deleteLabel} = useDeleteLabel();
   const {mutate:assigneLabel} = useAssignLabel();
+  const {mutate:unassignedLabel} = useunAssignLabel();
   const [labelss,setLabels] = useState(null);
   const [assigned,setAssigned] = useState([])
   console.log(users)
 
   const token = localStorage.getItem("login");
   const decoded = jwtDecode(token);
+  const [unassignedId,setUnassignedId] = useState(null);
 
   const totalAssigned = () => {
     
@@ -289,17 +291,48 @@ export default function Discountgetlabels({users}) {
   };
 
   const saveAssign = () => {
-   
-   assigneLabel(labelss);
-    setAssignLabelId(null);
+
+    if(unassignedId !== null){
+      unassignedLabel(unassignedId,{
+        onSuccess:()=>{
+          setUnassignedId(null);
+        }
+      });
+      setAssignLabelId(null);
+      return;
+    }
+
+    const data = {...labelss}
+    data.userId = assignSelected[0];
+    console.log(data);
+   assigneLabel(data);
+   setAssignLabelId(null);
   };
 
-  const toggleCustomer = (id) => {
-    console.log(id)
-    setAssignSelected(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
+ const toggleCustomer = (id) => {
+  console.log(id);
+
+  setAssignSelected(prev => {
+    if (prev?.includes(id)) {
+      setUnassignedId(id);
+      return prev?.filter(x => x !== id);
+    } else {
+      return [...prev, id];
+    }
+  });
+};
+
+ useEffect(()=>{
+const data = users?.reduce((acc, element) => {
+  if (element?.label?.labelName) {
+    acc.push(element._id);
+  }
+  return acc;
+}, []);
+
+console.log(data);
+setAssignSelected(data);
+ },[]);
 
   const assignLabel = getlabels?.find(l => l.id === assignLabelId);
 
@@ -466,7 +499,7 @@ export default function Discountgetlabels({users}) {
 
               <div style={styles.customerList}>
                 {users?.map(customer => {
-                  const checked = assignSelected.includes(customer._id);
+                  const checked = assignSelected?.includes(customer._id);
                   return (
                     <div key={customer.id} style={{ ...styles.customerRow, background: checked ? "#f5f2ee" : "transparent" }}
                       onClick={() => toggleCustomer(customer._id)}>
@@ -486,7 +519,7 @@ export default function Discountgetlabels({users}) {
               <div style={styles.modalActions}>
                 <button style={styles.btnCancel} onClick={() => setAssignLabelId(null)}>Cancel</button>
                 <button style={styles.btnSave} onClick={saveAssign}>
-                  Save ({assignSelected.length} selected)
+                  Save ({assignSelected?.length} selected)
                 </button>
               </div>
             </div>

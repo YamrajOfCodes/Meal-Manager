@@ -13,7 +13,8 @@ import {
   createLabel,
   getLabels,
   deleteLabel,
-  AssignLabel
+  AssignLabel,
+  UnAssignLabel
 } from "../../types/Admin/adminAPI";
 
 
@@ -218,6 +219,25 @@ export const useAssignLabel = () => {
 
     onError: () => {
       toast.error("Failed to assign label");
+    }
+  });
+};
+
+
+export const useunAssignLabel = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: UnAssignLabel,
+
+    onSuccess: (_,) => {
+      toast.success("label unassigned successfully");
+
+      queryClient.setQueryData(["label"]);
+    },
+
+    onError: () => {
+      toast.error("Failed to unassigned label");
     }
   });
 };

@@ -250,9 +250,26 @@ export const AssignLabel = async(req,res)=>{
     const getUser = await User.findById(userId);
     console.log(getUser);
     getUser.label.labelName = labelName;
-    getuser.label.discount = discount;
-    await getuser.save();
+    getUser.label.labelPrice = discount;
+    await getUser.save();
     return res.status(200).json("label is assigned");
+  } catch (error) {
+     console.log(error);
+    return res.status(400).json({error});
+  }
+}
+
+
+export const UnassignLabel = async(req,res)=>{
+  try {
+    const {userId} = req.params;
+
+    const getUser = await User.findById(userId);
+    console.log(getUser);
+    getUser.label.labelName = "";
+    getUser.label.labelPrice = null;
+    await getUser.save();
+    return res.status(200).json("label is unassigned");
   } catch (error) {
      console.log(error);
     return res.status(400).json({error});

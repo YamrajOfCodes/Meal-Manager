@@ -47,11 +47,8 @@ function OrdersPage({ orders = [] }) {
   const meals   = ["All","Breakfast","Lunch","Dinner"];
   const statuses= ["All","Confirmed","Pending","Cancelled","Delivered"];
 
-  /* ── derived stats ── */
- 
+  const [Revenues,setRevenue] = useState(0);
 
-  /* ── filtered list ── */
-;
 const filtered = useMemo(() => {
   let list = orders.filter((order) => {
     return (
@@ -60,6 +57,16 @@ const filtered = useMemo(() => {
     );
   });
 
+  const dataset = list?.reduce((acc,curr)=>{
+      acc = acc + curr.price;
+      return acc;
+  },0);
+
+  setRevenue(dataset)
+
+ 
+
+  
   if (search.trim()) {
     const q = search.toLowerCase();
     list = list.filter(o =>
@@ -159,7 +166,7 @@ const stats = useMemo(() => {
           },
           {
             label:"Revenue",
-            val:`₹${stats.revenue.toLocaleString("en-IN")}`,
+            val:`₹ ${Revenues}`,
             icon:"M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6",
             color:"#15803d", bg:"#f0fdf4",
           },

@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { login, logout, register } from "../../types/Auth/authAPI"
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getUserData, login, logout, register } from "../../types/Auth/authAPI"
 
 import toast from 'react-hot-toast';
 import {jwtDecode} from 'jwt-decode';
@@ -96,5 +96,20 @@ export const useLogout = () => {
     onError: () => {
       toast.error('Error logging out. Please try again.');
     },
+  });
+};
+
+
+export const useGetUserData = (userId) => {
+  const queryClient = useQueryClient();
+   queryClient.invalidateQueries({ queryKey: ['users'] });
+
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: () =>
+      getUserData(userId).then((res) => {
+        return res;
+      }),
+    enabled: !!userId,
   });
 };

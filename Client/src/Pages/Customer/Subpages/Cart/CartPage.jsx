@@ -1,9 +1,9 @@
 import React from 'react'
 import { Ic } from '../../CustomerDashboard'
 
-const CartPage = ({cartRows,cartCount,cartTotal,placeOrder,balance,clear,VegBox,IC,setTab,dec,inc}) => {
+const CartPage = ({cartRows,cartCount,cartTotal,placeOrder,balance,clear,VegBox,IC,setTab,dec,inc,discount}) => {
   
-  // console.log(cartRows);
+  console.log(discount);
   return (
     <div>
          <div className="slide max-w-lg mx-auto w-full flex flex-col gap-4">
@@ -31,14 +31,15 @@ const CartPage = ({cartRows,cartCount,cartTotal,placeOrder,balance,clear,VegBox,
                           <VegBox isVeg={item.isVeg}/>
                           <div className="flex-1">
                             <p className="text-[13px] font-semibold text-[#1c1812]">{item.name}</p>
-                            <p className="text-[11px] text-[#9a8f82]">₹{item.price} each</p>
-                          </div>
+<p className="text-[11px] text-[#9a8f82]">
+  ₹{Number(item.price) - Number(discount ?? 0)} each
+</p>                          </div>
                           <div className="flex items-center gap-2">
                             <button className="qty-ring bg-[#faf8f5] text-[#5a5048] hover:bg-[#fdecea] hover:text-[#c0392b]" onClick={()=>dec(item._id)}>−</button>
                             <span className="text-[13px] font-bold w-5 text-center">{qty}</span>
                             <button className="qty-ring bg-[#faf8f5] text-[#5a5048] hover:bg-[#eaf5ef] hover:text-[#1a7f5a]" onClick={()=>inc(item._id)}>+</button>
                           </div>
-                          <p className="font-bold text-[14px] text-[#1c1812] w-14 text-right">₹{item.price*qty}</p>
+                          <p className="font-bold text-[14px] text-[#1c1812] w-14 text-right">₹{discount ? item.price*qty - discount * qty : item.price * qty}</p>
                         </div>
                       ))}
                     </div>

@@ -8,7 +8,7 @@ import OverViewPage from "./Subpages/OverView/OverViewPage";
 import { useGetComplaints, useGetMenuItems, useGetMyOrders, usePlaceOrder, useRaiseComplaint } from "../../hooks/User/userHooks";
 import { jwtDecode } from "jwt-decode";
 import { useGetNotices } from "../../hooks/Admin/adminHooks";
-import { useLogout } from "../../hooks/authHooks/authHooks";
+import { useGetUserData, useLogout } from "../../hooks/authHooks/authHooks";
 import Loader from "../../components/AdminComponents/Shared/Loader";
 
 /* ─────────────────────────────────────────────
@@ -88,10 +88,14 @@ export default function UserDashboard() {
 
   const token = localStorage.getItem("login");
   let decoded, messCode;
+
   try {
     decoded = jwtDecode(token);
+    // console.log(decoded._id)
     messCode = decoded?.messCode;
-    console.log(decoded)
+    // console.log(decoded)
+
+
   } catch (error) {
     console.error("Failed to decode token:", error);
     messCode = null; // or some default
@@ -112,9 +116,9 @@ export default function UserDashboard() {
   const [cDone, setCDone] = useState(false);
   const [toast, setToast] = useState(null);
   const { mutate: logout } = useLogout();
+  const {data:usersdata} = useGetUserData(decoded._id);
 
-
-  //  console.log(messCode)
+  console.log("usersdata",usersdata);
 
   const { data: fetchedMenu = [], isLoading: menuLoading } = useGetMenuItems(messCode);
   const { data: complaints } = useGetComplaints(messCode);
@@ -122,8 +126,12 @@ export default function UserDashboard() {
   const { mutate: raiseComplaint } = useRaiseComplaint();
   const { data: getNotices } = useGetNotices(messCode);
   const { data: myOrders = [] } = useGetMyOrders(decoded?._id);
+
+  console.log(myOrders)
   const totalPrice = myOrders[0]?.userId?.payment || 0;
   const [loader,setLoader] = useState(false);
+
+
 
 
   // console.log(complaintss);
@@ -145,49 +153,75 @@ export default function UserDashboard() {
   });
   const clear = () => setCart({});
 
-  const cartRows = Object.entries(cart)
-    .map(([id, qty]) => ({ item: menu.find(m => m._id === id), qty }))
-    .filter(x => x.item);
-  const cartTotal = cartRows.reduce((s, { item, qty }) => s + item.price * qty, 0);
-  const cartCount = Object.values(cart).reduce((s, q) => s + q, 0);
+ 
+  // ── build cart rows ──
+const cartRows = Object.entries(cart)
+  .map(([id, qty]) => ({
+    item: menu.find(m => m._id === id),
+    qty
+  }))
+  .filter(x => x.item);
 
-  /* ── place order ── */
-  const placeOrder = () => {
-    if (!cartRows.length) return;
+// ── discount (safe) ──
+const discount = Number(usersdata?.label?.labelPrice ?? 0);
 
-    setLoader(true);
+// ── helper to calculate final price per item ──
+const getFinalPrice = (price) => {
+  const p = Number(price) || 0;
+  return Math.max(0, p - discount);
+};
 
-    const id = decoded?._id || "UnknownUser";
-    const now = new Date();
+// ── total price ──
+const cartTotal = cartRows.reduce((sum, { item, qty }) => {
+  return sum + getFinalPrice(item.price) * qty;
+}, 0);
 
-    // console.log("Placing order for user ID:", id);
+// ── total quantity ──
+const cartCount = Object.values(cart).reduce((s, q) => s + q, 0);
 
-    let data =
-    {
-      userId: id,   // ✅ works now
-      messCode: decoded?.messCode,
-      items: cartRows.map(({ item, qty }) => ({
-        name: item.name,
-        qty,
-        price: item.price
-      })),
-      total: cartTotal,
-      time: now.toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit"
-      }),
-      date: now.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short"
-      }),
-      status: "Confirmed",
-      mealTime: cartRows[0].item.mealTime, // assuming all items are from the same meal time
-    }
+console.log("Cart Total:", cartTotal);
+console.log("Cart Count:", cartCount);
 
-    // console.log(data.items[0])
+// ── place order ──
+const placeOrder = () => {
+  if (!cartRows.length) return;
 
+  setLoader(true);
 
-    placeOrderMutation(data,{
+  const id = decoded?._id || "UnknownUser";
+  const now = new Date();
+
+  const data = {
+    userId: id,
+    messCode: decoded?.messCode,
+
+    items: cartRows.map(({ item, qty }) => ({
+      name: item.name,
+      qty,
+      price: getFinalPrice(item.price) * qty || 0,
+      finalPrice: getFinalPrice(item.price) // ✅ useful for backend/UI
+    })),
+
+    total: cartTotal,
+
+    time: now.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit"
+    }),
+
+    date: now.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short"
+    }),
+
+    status: "Confirmed",
+
+    mealTime: cartRows[0]?.item?.mealTime || "Unknown"
+  };
+
+  console.log(data)
+
+     placeOrderMutation(data,{
       onSuccess:()=>{
          setLoader(false);
       },
@@ -202,7 +236,7 @@ export default function UserDashboard() {
     setBalance(b => b + cartTotal);
     fire(`Order placed! ₹${cartTotal} added to balance.`);
     setTab("orders");
-  };
+};
 
 
   /* ── complaint submit ── */
@@ -564,6 +598,7 @@ const NAV = [
             cartTotal={cartTotal}
             loading={menuLoading}
             setTab={setTab}
+            loginUser={usersdata}
           />
         )}
 
@@ -581,6 +616,7 @@ const NAV = [
             setTab={setTab}
             dec={dec}
             inc={inc}
+            discount={usersdata?.label?.labelPrice}
           />
         )}
 

@@ -15,7 +15,8 @@ import {
     createLabel,
     deleteLabel,
     getallLables,
-    AssignLabel
+    AssignLabel,
+    UnassignLabel
    } from "../../Controller/Admin/adminController.js";
 import adminauthenticate from "../../MiddleWare/Admin/adminAuthenticate.js";
 
@@ -41,6 +42,7 @@ router.get("/getlabel",adminauthenticate,getallLables);
 router.delete("/deleteLabel/:labelId",deleteLabel);
 
 router.put("/assignlabel",adminauthenticate,AssignLabel);
+router.put("/unassignlabel/:userId",adminauthenticate,UnassignLabel);
 
 
 

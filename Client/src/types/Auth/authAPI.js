@@ -22,3 +22,10 @@ export const logout = async () => {
     }
   );
 };
+
+
+export const getUserData = async (userId) => {
+  const token = localStorage.getItem('login');
+  const res = await api.get(`/auth/getUserData/${userId}`);
+  return res.data.data;
+};
