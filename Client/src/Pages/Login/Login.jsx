@@ -231,9 +231,7 @@ const handleLogin = () => {
 
       {/* ══════════ LEFT PANEL ══════════ */}
       <div className="flex-1 bg-white flex flex-col px-12 py-10 relative overflow-hidden hidden md:flex">
-        {/* Decorative radial glow */}
 
-        {/* Brand Header */}
         <div className="flex items-center gap-3 mb-12 relative z-10">
           <div className="w-11 h-11 bg-amber-900 rounded-xl flex items-center justify-center shrink-0">
             <TiffinIcon size={24} />
@@ -244,7 +242,6 @@ const handleLogin = () => {
           </div>
         </div>
 
-        {/* Hero */}
         <div className="relative z-10 mb-10">
           <div className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 text-[11px] font-medium px-3 py-1 rounded-full mb-4 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
@@ -262,14 +259,12 @@ const handleLogin = () => {
           </p>
         </div>
 
-        {/* Feature Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5 mb-10 relative z-10">
           {features.map((f, i) => (
             <FeatureCard key={i} feature={f} />
           ))}
         </div>
 
-        {/* Stats Row */}
         <div className="flex gap-8 relative z-10">
           {stats.map((s, i) => (
             <div key={i} className="flex items-stretch gap-8">
@@ -282,7 +277,6 @@ const handleLogin = () => {
           ))}
         </div>
 
-        {/* Bottom wave decoration */}
         <div
           className="absolute bottom-0 left-0 right-0 h-1.5 opacity-10"
           style={{
@@ -297,12 +291,11 @@ const handleLogin = () => {
      <div className="flex w-full md:w-[440px] items-center justify-center min-h-screen bg-stone-100 px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl border border-stone-200 overflow-hidden">
 
-        {/* Top accent bar */}
         <div className="h-1 bg-amber-700 w-full" />
 
         <div className="px-7 py-7">
 
-          {/* Brand */}
+      
           <div className="flex items-center gap-2.5 mb-7">
             <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -317,7 +310,7 @@ const handleLogin = () => {
             </div>
           </div>
 
-          {/* Heading */}
+      
           <div className="mb-5">
             <p className="text-lg font-medium text-stone-900">
               {mode === "login" ? "Welcome back" : "Create account"}
@@ -329,7 +322,7 @@ const handleLogin = () => {
             </p>
           </div>
 
-          {/* Role toggle (register only) */}
+     
           {mode === "register" && (
             <div className="flex gap-2 mb-5">
               {[

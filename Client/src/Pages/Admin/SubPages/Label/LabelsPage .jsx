@@ -259,6 +259,8 @@ export default function Discountgetlabels({users}) {
     
   };
   const {data:getlabels} = useGetLabels(decoded?._id);
+
+  console.log(getlabels)
   
   const maxDiscount = getlabels?.length ? Math.max(...getlabels.map(l => l.discount)) : 0;
 

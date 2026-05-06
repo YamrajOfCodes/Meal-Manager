@@ -133,18 +133,12 @@ export default function UserDashboard() {
 
 
 
-
-  // console.log(complaintss);
-
-
-
-  /* ── toast ── */
   const fire = (msg, type = "ok") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 2600);
   };
 
-  /* ── cart utils ── */
+
   const inc = id => setCart(c => ({ ...c, [id]: (c[id] || 0) + 1 }));
   const dec = id => setCart(c => {
     const n = { ...c };
@@ -153,8 +147,6 @@ export default function UserDashboard() {
   });
   const clear = () => setCart({});
 
- 
-  // ── build cart rows ──
 const cartRows = Object.entries(cart)
   .map(([id, qty]) => ({
     item: menu.find(m => m._id === id),
@@ -162,21 +154,20 @@ const cartRows = Object.entries(cart)
   }))
   .filter(x => x.item);
 
-// ── discount (safe) ──
 const discount = Number(usersdata?.label?.labelPrice ?? 0);
 
-// ── helper to calculate final price per item ──
+
 const getFinalPrice = (price) => {
   const p = Number(price) || 0;
   return Math.max(0, p - discount);
 };
 
-// ── total price ──
+
 const cartTotal = cartRows.reduce((sum, { item, qty }) => {
   return sum + getFinalPrice(item.price) * qty;
 }, 0);
 
-// ── total quantity ──
+
 const cartCount = Object.values(cart).reduce((s, q) => s + q, 0);
 
 console.log("Cart Total:", cartTotal);
