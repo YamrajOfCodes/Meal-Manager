@@ -85,20 +85,24 @@ function VegBox({ isVeg }) {
 ═══════════════════════════════════════════════ */
 export default function UserDashboard() {
 
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("login");
-  let decoded, messCode;
 
+  if (!token) {
+    navigate("/");
+    return null;
+  }
+
+  let decoded, messCode;
   try {
     decoded = jwtDecode(token);
-    // console.log(decoded._id)
     messCode = decoded?.messCode;
-    // console.log(decoded)
-
-
   } catch (error) {
     console.error("Failed to decode token:", error);
-    messCode = null; // or some default
+    localStorage.removeItem("login");
+    navigate("/");
+    return null;
   }
 
 
@@ -108,15 +112,16 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [mealFilter, setMealFilter] = useState("All");
   const [vegOnly, setVegOnly] = useState(false);
-  const [cart, setCart] = useState({});        // { _id: qty }
+  const [cart, setCart] = useState({});  
   const [balance, setBalance] = useState(0);
   const [orders, setOrders] = useState([]);
-  // const [complaints, setComplaints] = useState([]);
   const [cForm, setCForm] = useState({ cat: "", desc: "", messCode, date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), status: "open", userId: decoded._id });
   const [cDone, setCDone] = useState(false);
   const [toast, setToast] = useState(null);
   const { mutate: logout } = useLogout();
   const {data:usersdata} = useGetUserData(decoded._id);
+
+  console.log(usersdata)
 
 
 
@@ -190,7 +195,7 @@ const placeOrder = () => {
       name: item.name,
       qty,
       price: getFinalPrice(item.price) * qty || 0,
-      finalPrice: getFinalPrice(item.price) // ✅ useful for backend/UI
+      finalPrice: getFinalPrice(item.price)
     })),
 
     total: cartTotal,
@@ -221,7 +226,6 @@ const placeOrder = () => {
         setLoader(false);
       }
     });
-    // console.log(data)
     setCart({});
 
     setBalance(b => b + cartTotal);
@@ -253,12 +257,20 @@ const placeOrder = () => {
     })
     setCDone(true);
     setTimeout(() => setCDone(false), 2500);
-    fire("Complaint submitted. We'll respond within 24 hrs.", "info");
   };
 
-  const handleLogout = () => {
-    logout();
-  }
+ const handleLogout = () => {
+  logout(undefined, {
+    onSuccess: () => {
+      localStorage.removeItem("login");
+      navigate("/");
+    },
+    onError: () => {
+      localStorage.removeItem("login");
+      navigate("/");
+    }
+  });
+};
 
   /* ── filtered + grouped menu ── */
   const todays = new Date().toDateString();
@@ -572,7 +584,7 @@ const NAV = [
             cart={cart}
             notices={getNotices}
             totalPrice={totalPrice}
-            user={usersdata?.name}
+            user={usersdata}
           />
         )}
 

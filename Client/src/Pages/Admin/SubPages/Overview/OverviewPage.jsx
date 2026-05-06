@@ -72,7 +72,7 @@ console.log(grouped)
           style={{ background: "rgba(255,255,255,.08)" }}
         />
         <div className="relative z-10">
-          <div className="text-white text-xl font-serif">Good morning, Ramesh 👋</div>
+          <div className="text-white text-xl font-serif">Hello {users?.name}</div>
           <div className="text-white/75 text-xs mt-1">Here's what's happening at Patil Mess today.</div>
         </div>
         <div

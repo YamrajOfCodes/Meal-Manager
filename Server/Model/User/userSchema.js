@@ -36,6 +36,9 @@ const userSchema = new mongoose.Schema({
     type:Number,
     default:0
   },
+  advance:{
+   type:Number
+  },
 
   city:{
     type:String,

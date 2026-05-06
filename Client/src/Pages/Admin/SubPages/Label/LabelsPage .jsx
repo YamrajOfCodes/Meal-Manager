@@ -1,534 +1,323 @@
 import { useEffect, useState } from "react";
 import { useAssignLabel, useCreateLabel, useDeleteLabel, useGetLabels, useunAssignLabel } from "../../../../hooks/Admin/adminHooks";
-import {jwtDecode} from "jwt-decode"
-
-const CUSTOMERS = [
-  { id: 1, name: "Rohit Sharma", email: "rohit@email.com", initials: "RS", bg: "#d4e8d4", orders: 24 },
-  { id: 2, name: "Priya Patel",  email: "priya@email.com", initials: "PP", bg: "#d4d4e8", orders: 11 },
-  { id: 3, name: "Arjun Mehta",  email: "arjun@email.com", initials: "AM", bg: "#e8d4d4", orders: 38 },
-  { id: 4, name: "Neha Singh",   email: "neha@email.com",  initials: "NS", bg: "#e8e4d4", orders: 7  },
-  { id: 5, name: "Vikram Das",   email: "vikram@email.com",initials: "VD", bg: "#d4e4e8", orders: 15 },
-];
+import { jwtDecode } from "jwt-decode";
 
 const TIERS = ["basic", "silver", "gold", "vip", "custom"];
 
-const TIER_STYLES = {
-  basic:  { bar: "#1a7a4a", badge: { bg: "#e8f5ee", color: "#1a7a4a" }, pct: "#1a7a4a" },
-  silver: { bar: "#8a857e", badge: { bg: "#f0eeeb", color: "#8a857e" }, pct: "#8a857e" },
-  gold:   { bar: "#c5911a", badge: { bg: "#fdf6e8", color: "#c5911a" }, pct: "#c5911a" },
-  vip:    { bar: "#6b3fa0", badge: { bg: "#f2ecfb", color: "#6b3fa0" }, pct: "#6b3fa0" },
-  custom: { bar: "#d4541a", badge: { bg: "#fdf0ea", color: "#d4541a" }, pct: "#d4541a" },
+const TIER_CONFIG = {
+  basic:  { color: "#16a34a", light: "#f0fdf4", label: "Basic"  },
+  silver: { color: "#71717a", light: "#f4f4f5", label: "Silver" },
+  gold:   { color: "#d97706", light: "#fffbeb", label: "Gold"   },
+  vip:    { color: "#7c3aed", light: "#f5f3ff", label: "VIP"    },
+  custom: { color: "#dc2626", light: "#fef2f2", label: "Custom" },
 };
 
-const AVATAR_COLORS = ["#d4e8d4", "#d4d4e8", "#e8d4d4", "#e8e4d4"];
+const AVATAR_POOL = ["#dbeafe", "#dcfce7", "#fce7f3", "#fef3c7", "#ede9fe"];
 
-const styles = {
-  page: {
-    fontFamily: "'DM Sans', sans-serif",
-    background: "#f5f2ee",
-    minHeight: "100vh",
-    padding: "32px 24px",
-    color: "#1a1714",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    marginBottom: 36,
-  },
-  h1: {
-    fontFamily: "'DM Serif Display', serif",
-    fontSize: "2.4rem",
-    letterSpacing: "-0.02em",
-    lineHeight: 1,
-    margin: 0,
-  },
-  subtext: { color: "#8a857e", fontSize: "0.88rem", marginTop: 4 },
-  btnCreate: {
-    display: "flex", alignItems: "center", gap: 8,
-    background: "#1a1714", color: "#fff",
-    border: "none", borderRadius: 10,
-    padding: "11px 20px",
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.88rem", fontWeight: 500,
-    cursor: "pointer",
-  },
-  statsRow: { display: "flex", gap: 12, marginBottom: 28, flexWrap: "wrap" },
-  statChip: {
-    background: "#fff", border: "1px solid #e4dfd8",
-    borderRadius: 10, padding: "10px 18px",
-    fontSize: "0.82rem", color: "#8a857e",
-    display: "flex", alignItems: "center", gap: 8,
-  },
-  statStrong: { color: "#1a1714", fontSize: "1rem", fontWeight: 600 },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-    gap: 16,
-  },
-  card: {
-    background: "#fff", border: "1px solid #e4dfd8",
-    borderRadius: 16, padding: 20,
-    position: "relative", overflow: "hidden",
-    transition: "box-shadow 0.2s, transform 0.2s",
-    cursor: "default",
-  },
-  cardTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 },
-  badge: {
-    display: "inline-flex", alignItems: "center", gap: 6,
-    padding: "4px 10px", borderRadius: 6,
-    fontSize: "0.74rem", fontWeight: 600,
-    letterSpacing: "0.04em", textTransform: "uppercase",
-    fontFamily: "'DM Mono', monospace",
-  },
-  cardMenuBtn: {
-    background: "none", border: "none",
-    color: "#8a857e", cursor: "pointer",
-    fontSize: "1rem", padding: "4px 8px",
-    borderRadius: 6,
-  },
-  cardName: {
-    fontFamily: "'DM Serif Display', serif",
-    fontSize: "1.4rem", letterSpacing: "-0.01em",
-    marginBottom: 6,
-  },
-  cardDesc: { fontSize: "0.82rem", color: "#8a857e", lineHeight: 1.5, marginBottom: 16 },
-  discountDisplay: { display: "flex", alignItems: "baseline", gap: 4, marginBottom: 16 },
-  discountPct: {
-    fontFamily: "'DM Serif Display', serif",
-    fontSize: "2.6rem", lineHeight: 1, letterSpacing: "-0.03em",
-  },
-  discountLabel: { fontSize: "0.8rem", color: "#8a857e", fontWeight: 500 },
-  divider: { height: 1, background: "#e4dfd8", marginBottom: 14 },
-  cardMeta: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-  avatarStack: { display: "flex" },
-  avatar: {
-    width: 22, height: 22, borderRadius: "50%",
-    border: "2px solid #fff",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: "0.6rem", fontWeight: 700,
-    marginLeft: -6, position: "relative",
-  },
-  customersText: { fontSize: "0.8rem", color: "#8a857e", marginLeft: 6 },
-  btnAssign: {
-    display: "flex", alignItems: "center", gap: 5,
-    background: "none", border: "1.5px solid #e4dfd8",
-    borderRadius: 8, padding: "6px 12px",
-    fontSize: "0.78rem", fontWeight: 500,
-    fontFamily: "'DM Sans', sans-serif",
-    color: "#1a1714", cursor: "pointer",
-  },
-  // Modal
-  overlay: {
-    position: "fixed", inset: 0,
-    background: "rgba(26,23,20,0.5)",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    zIndex: 100, backdropFilter: "blur(3px)",
-  },
-  modal: {
-    background: "#fff", borderRadius: 20,
-    width: 420, maxWidth: "calc(100vw - 32px)",
-    padding: 28,
-    boxShadow: "0 24px 60px rgba(0,0,0,0.18)",
-  },
-  modalHeader: {
-    display: "flex", justifyContent: "space-between",
-    alignItems: "center", marginBottom: 22,
-  },
-  modalTitle: {
-    fontFamily: "'DM Serif Display', serif",
-    fontSize: "1.5rem", letterSpacing: "-0.01em",
-    margin: 0,
-  },
-  modalClose: {
-    background: "#f5f2ee", border: "none",
-    width: 32, height: 32, borderRadius: 8,
-    fontSize: "1rem", cursor: "pointer",
-    color: "#8a857e",
-    display: "flex", alignItems: "center", justifyContent: "center",
-  },
-  field: { marginBottom: 14 },
-  label: {
-    display: "block", fontSize: "0.78rem",
-    fontWeight: 600, color: "#8a857e",
-    letterSpacing: "0.04em", textTransform: "uppercase",
-    marginBottom: 6,
-  },
-  input: {
-    width: "100%", padding: "10px 12px",
-    border: "1.5px solid #e4dfd8", borderRadius: 10,
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.9rem", color: "#1a1714",
-    background: "#f5f2ee", outline: "none",
-    boxSizing: "border-box",
-  },
-  fieldRow: { display: "flex", gap: 10 },
-  discountPreview: {
-    background: "#fdf0ea", border: "1.5px dashed #e8b090",
-    borderRadius: 10, padding: "12px 16px",
-    display: "flex", alignItems: "center", gap: 12,
-    marginBottom: 18,
-  },
-  previewPct: {
-    fontFamily: "'DM Serif Display', serif",
-    fontSize: "2rem", color: "#d4541a", lineHeight: 1,
-  },
-  previewText: { fontSize: "0.82rem", color: "#d4541a", lineHeight: 1.5 },
-  modalActions: { display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 },
-  btnCancel: {
-    background: "none", border: "1.5px solid #e4dfd8",
-    borderRadius: 10, padding: "10px 18px",
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.88rem", fontWeight: 500,
-    cursor: "pointer", color: "#8a857e",
-  },
-  btnSave: {
-    background: "#1a1714", color: "#fff",
-    border: "none", borderRadius: 10,
-    padding: "10px 22px",
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.88rem", fontWeight: 500,
-    cursor: "pointer",
-  },
-  customerList: { maxHeight: 220, overflowY: "auto", marginBottom: 16 },
-  customerRow: {
-    display: "flex", alignItems: "center", gap: 12,
-    padding: "10px 12px", borderRadius: 10, cursor: "pointer",
-  },
-  customerAvatar: {
-    width: 34, height: 34, borderRadius: "50%",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: "0.8rem", fontWeight: 700, flexShrink: 0,
-  },
-  customerName: { fontSize: "0.9rem", fontWeight: 600, display: "block" },
-  customerSub: { fontSize: "0.78rem", color: "#8a857e" },
-  check: {
-    width: 18, height: 18, borderRadius: 5,
-    border: "2px solid #e4dfd8", flexShrink: 0,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: "0.7rem",
-  },
-  checkActive: {
-    background: "#1a1714", border: "2px solid #1a1714", color: "#fff",
-  },
-  assignInfo: {
-    background: "#f5f2ee", borderRadius: 10,
-    padding: "10px 14px", marginBottom: 14,
-    fontSize: "0.82rem", color: "#8a857e",
-  },
-  emptyState: {
-    textAlign: "center", padding: "48px 24px",
-    color: "#8a857e", background: "#fff",
-    border: "1px dashed #e4dfd8", borderRadius: 16,
-    gridColumn: "1 / -1",
-  },
-};
-
-// Google Fonts loader
-const FontLoader = () => (
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
-    rel="stylesheet"
-  />
-);
-
-const INITIAL_getlabels = [
-  { id: 1, name: "Basic Saver", tier: "basic",  discount: 5,  minOrder: 0,    desc: "Entry-level discount for regular customers.", assigned: [1, 4] },
-  { id: 2, name: "Silver Deal", tier: "silver", discount: 12, minOrder: 500,  desc: "Rewarding loyal buyers with mid-tier savings.", assigned: [2] },
-  { id: 3, name: "Gold Member", tier: "gold",   discount: 20, minOrder: 1500, desc: "Premium savings for high-value customers.", assigned: [3, 5] },
-];
-
-export default function Discountgetlabels({users}) {
-  const [showCreate, setShowCreate] = useState(false);
+export default function DiscountLabels({ users }) {
+  const [showCreate, setShowCreate]   = useState(false);
   const [assignLabelId, setAssignLabelId] = useState(null);
   const [form, setForm] = useState({ name: "", tier: "basic", discount: "", minOrder: "", desc: "" });
   const [assignSelected, setAssignSelected] = useState([]);
-  const {mutate:createLabel} = useCreateLabel();
-  const {mutate:deleteLabel} = useDeleteLabel();
-  const {mutate:assigneLabel} = useAssignLabel();
-  const {mutate:unassignedLabel} = useunAssignLabel();
-  const [labelss,setLabels] = useState(null);
-  const [assigned,setAssigned] = useState([])
-  console.log(users)
-  
-  const token = localStorage.getItem("login");
-  const decoded = jwtDecode(token);
-  const [unassignedId,setUnassignedId] = useState(null);
-  
-  const totalAssigned = () => {
-    
-  };
-  const {data:getlabels} = useGetLabels(decoded?._id);
+  const [unassignedId, setUnassignedId]     = useState(null);
+  const [labelss, setLabels]                = useState(null);
 
-  console.log(getlabels)
-  
+  const { mutate: createLabel }    = useCreateLabel();
+  const { mutate: deleteLabel }    = useDeleteLabel();
+  const { mutate: assigneLabel }   = useAssignLabel();
+  const { mutate: unassignedLabel } = useunAssignLabel();
+
+  const token   = localStorage.getItem("login");
+  const decoded = jwtDecode(token);
+
+  const { data: getlabels } = useGetLabels(decoded?._id);
+
   const maxDiscount = getlabels?.length ? Math.max(...getlabels.map(l => l.discount)) : 0;
 
   const handleCreate = () => {
     if (!form.name || !form.discount) return;
-    const data = {
-      userId:decoded._id,
-      labelName:form.name,
-      tier:form.tier,
-      discount:Number(form.discount),
-      minOrderValue:Number(form.minOrder) || 0,
-      description:form.desc
-    }
+    createLabel({
+      userId: decoded._id,
+      labelName: form.name,
+      tier: form.tier,
+      discount: Number(form.discount),
+      minOrderValue: Number(form.minOrder) || 0,
+      description: form.desc,
+    });
     setShowCreate(false);
-    createLabel(data);
     setForm({ name: "", tier: "basic", discount: "", minOrder: "", desc: "" });
   };
 
-  const handleDelete = (id) => {
-    deleteLabel(id);
-  };
+  const handleDelete = (id) => deleteLabel(id);
 
-  console.log(getlabels)
-
-  const openAssign = (id,labell) => {
-    setLabels(labell);
+  const openAssign = (id, label) => {
+    setLabels(label);
     setAssignLabelId(id);
-    const label = getlabels?.find(l => l.id === id);
-    setAssignSelected([...label.assigned]);
+    const found = getlabels?.find(l => l.id === id);
+    setAssignSelected([...(found?.assigned || [])]);
   };
 
   const saveAssign = () => {
-
-    if(unassignedId !== null){
-      unassignedLabel(unassignedId,{
-        onSuccess:()=>{
-          setUnassignedId(null);
-        }
-      });
+    if (unassignedId !== null) {
+      unassignedLabel(unassignedId, { onSuccess: () => setUnassignedId(null) });
       setAssignLabelId(null);
       return;
     }
-
-    const data = {...labelss}
-    data.userId = assignSelected[0];
-    console.log(data);
-   assigneLabel(data);
-   setAssignLabelId(null);
+    const data = { ...labelss, userId: assignSelected[0] };
+    assigneLabel(data);
+    setAssignLabelId(null);
   };
 
- const toggleCustomer = (id) => {
-  console.log(id);
-
-  setAssignSelected(prev => {
-    if (prev?.includes(id)) {
-      setUnassignedId(id);
-      return prev?.filter(x => x !== id);
-    } else {
+  const toggleCustomer = (id) => {
+    setAssignSelected(prev => {
+      if (prev?.includes(id)) { setUnassignedId(id); return prev.filter(x => x !== id); }
       return [...prev, id];
-    }
-  });
-};
+    });
+  };
 
- useEffect(()=>{
-const data = users?.reduce((acc, element) => {
-  if (element?.label?.labelName) {
-    acc.push(element._id);
-  }
-  return acc;
-}, []);
-
-console.log(data);
-setAssignSelected(data);
- },[]);
+  useEffect(() => {
+    const data = users?.reduce((acc, el) => {
+      if (el?.label?.labelName) acc.push(el._id);
+      return acc;
+    }, []);
+    setAssignSelected(data || []);
+  }, []);
 
   const assignLabel = getlabels?.find(l => l.id === assignLabelId);
 
+  const inputStyle = {
+    width: "100%",
+    padding: "9px 12px",
+    border: "1px solid #e2e8f0",
+    borderRadius: 8,
+    fontSize: 14,
+    color: "#1e293b",
+    background: "#f8fafc",
+    outline: "none",
+    boxSizing: "border-box",
+    fontFamily: "inherit",
+    transition: "border-color 0.15s",
+  };
+
+  const btnPrimary = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    background: "#1e293b",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    padding: "9px 18px",
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+    fontFamily: "inherit",
+  };
+
+  const btnSecondary = {
+    background: "none",
+    border: "1px solid #e2e8f0",
+    borderRadius: 8,
+    padding: "9px 16px",
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+    color: "#64748b",
+    fontFamily: "inherit",
+  };
+
+  const overlay = {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(15,23,42,0.45)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 200,
+    padding: "16px",
+  };
+
+  const modal = {
+    background: "#fff",
+    borderRadius: 14,
+    width: "100%",
+    maxWidth: 440,
+    padding: "24px",
+    boxSizing: "border-box",
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
   return (
-    <>
-      <FontLoader />
-      <div style={styles.page}>
+    <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "clamp(16px, 4vw, 36px) clamp(12px, 4vw, 28px)", fontFamily: "'Inter', system-ui, sans-serif", color: "#1e293b" }}>
 
-        {/* Header */}
-        <div style={styles.header}>
-          <div>
-            <h1 style={styles.h1}>Discount getlabels</h1>
-            <p style={styles.subtext}>Assign getlabels to customers for automatic order discounts</p>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, gap: 12, flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700, margin: "0 0 4px", letterSpacing: "-0.4px" }}>Discount Labels</h1>
+          <p style={{ fontSize: 13, color: "#64748b", margin: 0 }}>Assign labels to customers for automatic order discounts</p>
+        </div>
+        <button style={btnPrimary} onClick={() => setShowCreate(true)}>
+          + Create Label
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
+        {[
+          { icon: "🏷️", val: getlabels?.length ?? 0, label: "Labels" },
+          { icon: "📊", val: `${maxDiscount}%`, label: "Max discount" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#64748b" }}>
+            <span>{s.icon}</span>
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#1e293b" }}>{s.val}</span>
+            <span>{s.label}</span>
           </div>
-          <button style={styles.btnCreate} onClick={() => setShowCreate(true)}>
-            + Create Label
-          </button>
-        </div>
+        ))}
+      </div>
 
-        {/* Stats */}
-        <div style={styles.statsRow}>
-          <div style={styles.statChip}>📋 <strong style={styles.statStrong}>{getlabels?.length}</strong> getlabels</div>
-          <div style={styles.statChip}>👥 <strong style={styles.statStrong}>{totalAssigned()}</strong> Customers Assigned</div>
-          <div style={styles.statChip}>🏷️ Up to <strong style={styles.statStrong}>{maxDiscount}%</strong> Discount</div>
-        </div>
-
-        {/* getlabels Grid */}
-        <div style={styles.grid}>
-          {getlabels?.length === 0 && (
-            <div style={styles.emptyState}>
-              <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>🏷️</div>
-              <p>No discount getlabels yet.<br />Create your first label to start rewarding customers.</p>
-            </div>
-          )}
-          {getlabels?.map(label => {
-            const ts = TIER_STYLES[label.tier];
-            // const assigned = CUSTOMERS.filter(c => label.assigned.includes(c.id));
-            return (
-              <div key={label.id} style={styles.card}>
-                {/* Top color bar */}
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: ts.bar }} />
-
-                <div style={styles.cardTop}>
-                  <span style={{ ...styles.badge, background: ts.badge.bg, color: ts.badge.color }}>
-                    {label.tier}
-                  </span>
-                  <button style={styles.cardMenuBtn} onClick={() => handleDelete(label._id)} title="Delete">✕</button>
-                </div>
-
-                <div style={styles.cardName}>{label.labelName}</div>
-                <div style={styles.cardDesc}>{label.description || "No description."}</div>
-
-                <div style={styles.discountDisplay}>
-                  <span style={{ ...styles.discountPct, color: ts.pct }}>{label.discount}%</span>
-                  <span style={styles.discountLabel}>
-                    discount on orders{label.minOrder > 0 ? ` ≥ ₹${label.minOrder.toLocaleString("en-IN")}` : ""}
-                  </span>
-                </div>
-
-                <div style={styles.divider} />
-
-                <div style={styles.cardMeta}>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    {assigned.length > 0 ? (
-                      <>
-                        <div style={styles.avatarStack}>
-                          {assigned.slice(0, 4).map((c, i) => (
-                            <div key={c.id} style={{ ...styles.avatar, background: AVATAR_COLORS[i % 4], marginLeft: i === 0 ? 0 : -6 }} title={c.name}>
-                              {c.initials}
-                            </div>
-                          ))}
-                          {assigned.length > 4 && (
-                            <div style={{ ...styles.avatar, background: "#e4dfd8", marginLeft: -6 }}>+{assigned.length - 4}</div>
-                          )}
-                        </div>
-                        <span style={styles.customersText}>{assigned.length} customer{assigned.length > 1 ? "s" : ""}</span>
-                      </>
-                    ) : (
-                      <span style={{ fontSize: "0.8rem", color: "#8a857e" }}>No customers assigned</span>
-                    )}
-                  </div>
-                  <button style={styles.btnAssign} onClick={() => openAssign(label.id,label)}>
-                    👤 Assign
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Create Modal */}
-        {showCreate && (
-          <div style={styles.overlay} onClick={(e) => e.target === e.currentTarget && setShowCreate(false)}>
-            <div style={styles.modal}>
-              <div style={styles.modalHeader}>
-                <h2 style={styles.modalTitle}>Create Label</h2>
-                <button style={styles.modalClose} onClick={() => setShowCreate(false)}>✕</button>
-              </div>
-
-              <div style={styles.field}>
-                <label style={styles.label}>Label Name</label>
-                <input style={styles.input} placeholder="e.g. Gold Member" value={form.name}
-                  onChange={e => setForm({ ...form, name: e.target.value })} />
-              </div>
-
-              <div style={styles.fieldRow}>
-                <div style={{ ...styles.field, flex: 1 }}>
-                  <label style={styles.label}>Tier</label>
-                  <select style={styles.input} value={form.tier} onChange={e => setForm({ ...form, tier: e.target.value })}>
-                    {TIERS.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
-                  </select>
-                </div>
-                <div style={{ ...styles.field, flex: 1 }}>
-                  <label style={styles.label}>Discount %</label>
-                  <input style={styles.input} type="number" min="1" max="100" placeholder="e.g. 20"
-                    value={form.discount} onChange={e => setForm({ ...form, discount: e.target.value })} />
-                </div>
-              </div>
-
-              <div style={styles.field}>
-                <label style={styles.label}>Min. Order Value (₹) — 0 for any order</label>
-                <input style={styles.input} type="number" min="0" placeholder="e.g. 500"
-                  value={form.minOrder} onChange={e => setForm({ ...form, minOrder: e.target.value })} />
-              </div>
-
-              <div style={styles.field}>
-                <label style={styles.label}>Description</label>
-                <textarea style={{ ...styles.input, resize: "none" }} rows={2}
-                  placeholder="Brief description of this label..."
-                  value={form.desc} onChange={e => setForm({ ...form, desc: e.target.value })} />
-              </div>
-
-              {form.discount > 0 && (
-                <div style={styles.discountPreview}>
-                  <div style={styles.previewPct}>{form.discount}%</div>
-                  <div style={styles.previewText}>
-                    <strong style={{ fontWeight: 600, display: "block" }}>Discount preview</strong>
-                    Customers with this label get {form.discount}% off
-                    {form.minOrder > 0 ? ` on orders ≥ ₹${Number(form.minOrder).toLocaleString("en-IN")}` : " on all orders"} automatically.
-                  </div>
-                </div>
-              )}
-
-              <div style={styles.modalActions}>
-                <button style={styles.btnCancel} onClick={() => setShowCreate(false)}>Cancel</button>
-                <button style={styles.btnSave} onClick={handleCreate}>Create Label</button>
-              </div>
-            </div>
+      {/* Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))", gap: 14 }}>
+        {getlabels?.length === 0 && (
+          <div style={{ textAlign: "center", padding: "52px 24px", background: "#fff", border: "1.5px dashed #e2e8f0", borderRadius: 14, gridColumn: "1 / -1", color: "#94a3b8" }}>
+            <div style={{ fontSize: 36, marginBottom: 10 }}>🏷️</div>
+            <p style={{ margin: 0, fontSize: 14 }}>No discount labels yet.<br />Create your first label to start rewarding customers.</p>
           </div>
         )}
 
-        {/* Assign Modal */}
-        {assignLabelId !== null && assignLabel && (
-          <div style={styles.overlay} onClick={(e) => e.target === e.currentTarget && setAssignLabelId(null)}>
-            <div style={styles.modal}>
-              <div style={styles.modalHeader}>
-                <h2 style={styles.modalTitle}>Assign Customers</h2>
-                <button style={styles.modalClose} onClick={() => setAssignLabelId(null)}>✕</button>
+        {getlabels?.map(label => {
+          const tc = TIER_CONFIG[label.tier] || TIER_CONFIG.basic;
+          return (
+            <div key={label._id} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, padding: 18, position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: tc.color, borderRadius: "14px 14px 0 0" }} />
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 9px", borderRadius: 6, fontSize: 11, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", background: tc.light, color: tc.color }}>
+                  {tc.label}
+                </span>
+                <button onClick={() => handleDelete(label._id)} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16, padding: "2px 6px", borderRadius: 6, lineHeight: 1 }} title="Delete">✕</button>
               </div>
 
-              <div style={styles.assignInfo}>
-                🏷️ <strong>{assignLabel.name}</strong> — {assignLabel.discount}% discount applies automatically at checkout.
+              <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, letterSpacing: "-0.2px" }}>{label.labelName}</div>
+              <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.55, marginBottom: 14 }}>{label.description || "No description."}</div>
+
+              <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 14 }}>
+                <span style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-1px", color: tc.color, lineHeight: 1 }}>{label.discount}%</span>
+                <span style={{ fontSize: 12, color: "#94a3b8" }}>
+                  off {label.minOrderValue > 0 ? `on orders ≥ ₹${label.minOrderValue.toLocaleString("en-IN")}` : "all orders"}
+                </span>
               </div>
 
-              <div style={styles.customerList}>
-                {users?.map(customer => {
-                  const checked = assignSelected?.includes(customer._id);
-                  return (
-                    <div key={customer.id} style={{ ...styles.customerRow, background: checked ? "#f5f2ee" : "transparent" }}
-                      onClick={() => toggleCustomer(customer._id)}>
-                      <div style={{ ...styles.customerAvatar, background: customer.bg }}>{customer.initials}</div>
-                      <div style={{ flex: 1 }}>
-                        <span style={styles.customerName}>{customer.name}</span>
-                        <span style={styles.customerSub}>{customer.email}</span>
-                      </div>
-                      <div style={{ ...styles.check, ...(checked ? styles.checkActive : {}) }}>
-                        {checked && "✓"}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <div style={{ height: 1, background: "#f1f5f9", margin: "0 0 14px" }} />
 
-              <div style={styles.modalActions}>
-                <button style={styles.btnCancel} onClick={() => setAssignLabelId(null)}>Cancel</button>
-                <button style={styles.btnSave} onClick={saveAssign}>
-                  Save ({assignSelected?.length} selected)
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: 12, color: "#94a3b8" }}>No customers assigned</span>
+                <button style={{ ...btnSecondary, padding: "6px 12px", fontSize: 12 }} onClick={() => openAssign(label.id, label)}>
+                  👤 Assign
                 </button>
               </div>
             </div>
-          </div>
-        )}
-
+          );
+        })}
       </div>
-    </>
+
+      {/* Create Modal */}
+      {showCreate && (
+        <div style={overlay} onClick={e => e.target === e.currentTarget && setShowCreate(false)}>
+          <div style={modal}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: "-0.3px" }}>Create Label</h2>
+              <button onClick={() => setShowCreate(false)} style={{ background: "#f1f5f9", border: "none", width: 30, height: 30, borderRadius: 7, cursor: "pointer", fontSize: 14, color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#64748b", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.04em" }}>Label Name</label>
+              <input style={inputStyle} placeholder="e.g. Gold Member" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            </div>
+
+            <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#64748b", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.04em" }}>Tier</label>
+                <select style={{ ...inputStyle, cursor: "pointer" }} value={form.tier} onChange={e => setForm({ ...form, tier: e.target.value })}>
+                  {TIERS.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#64748b", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.04em" }}>Discount %</label>
+                <input style={inputStyle} type="number" min="1" max="100" placeholder="e.g. 20" value={form.discount} onChange={e => setForm({ ...form, discount: e.target.value })} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#64748b", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.04em" }}>Min. Order Value (₹) — 0 for any</label>
+              <input style={inputStyle} type="number" min="0" placeholder="e.g. 500" value={form.minOrder} onChange={e => setForm({ ...form, minOrder: e.target.value })} />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#64748b", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.04em" }}>Description</label>
+              <textarea style={{ ...inputStyle, resize: "none" }} rows={2} placeholder="Brief description..." value={form.desc} onChange={e => setForm({ ...form, desc: e.target.value })} />
+            </div>
+
+            {Number(form.discount) > 0 && (
+              <div style={{ background: "#fff7ed", border: "1px dashed #fdba74", borderRadius: 9, padding: "12px 14px", display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+                <span style={{ fontSize: 30, fontWeight: 800, color: "#ea580c", lineHeight: 1 }}>{form.discount}₹</span>
+                <span style={{ fontSize: 13, color: "#c2410c", lineHeight: 1.5 }}>
+                  <strong style={{ display: "block", fontWeight: 600 }}>Preview</strong>
+                  {form.discount}% off {form.minOrder > 0 ? `on orders ≥ ₹${Number(form.minOrder).toLocaleString("en-IN")}` : "all orders"}
+                </span>
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button style={btnSecondary} onClick={() => setShowCreate(false)}>Cancel</button>
+              <button style={btnPrimary} onClick={handleCreate}>Create Label</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Modal */}
+      {assignLabelId !== null && assignLabel && (
+        <div style={overlay} onClick={e => e.target === e.currentTarget && setAssignLabelId(null)}>
+          <div style={modal}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: "-0.3px" }}>Assign Customers</h2>
+              <button onClick={() => setAssignLabelId(null)} style={{ background: "#f1f5f9", border: "none", width: 30, height: 30, borderRadius: 7, cursor: "pointer", fontSize: 14, color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            </div>
+
+            <div style={{ background: "#f8fafc", borderRadius: 8, padding: "10px 13px", marginBottom: 14, fontSize: 13, color: "#64748b" }}>
+              🏷️ <strong style={{ color: "#1e293b" }}>{assignLabel.labelName}</strong> — {assignLabel.discount}% off applied at checkout
+            </div>
+
+            <div style={{ maxHeight: 240, overflowY: "auto", marginBottom: 14 }}>
+              {users?.map((customer, i) => {
+                const checked = assignSelected?.includes(customer._id);
+                return (
+                  <div key={customer._id}
+                    onClick={() => toggleCustomer(customer._id)}
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 10px", borderRadius: 9, cursor: "pointer", background: checked ? "#f8fafc" : "transparent", marginBottom: 2 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: AVATAR_POOL[i % AVATAR_POOL.length], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0, color: "#475569" }}>
+                      {customer.name?.slice(0, 2).toUpperCase() || "??"}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{customer.name}</div>
+                      <div style={{ fontSize: 12, color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{customer.email}</div>
+                    </div>
+                    <div style={{ width: 18, height: 18, borderRadius: 5, border: checked ? "none" : "1.5px solid #cbd5e1", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, background: checked ? "#1e293b" : "transparent", color: "#fff" }}>
+                      {checked && "✓"}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button style={btnSecondary} onClick={() => setAssignLabelId(null)}>Cancel</button>
+              <button style={btnPrimary} onClick={saveAssign}>Save ({assignSelected?.length} selected)</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

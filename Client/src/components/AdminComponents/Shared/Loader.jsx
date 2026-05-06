@@ -10,7 +10,7 @@ const Loader = () => {
         </span>
       </div>
       <span className="text-[13px] font-medium text-[#9a8f82]">
-        Loading your mess data...
+        We are proceeding...
       </span>
     </div>
   )

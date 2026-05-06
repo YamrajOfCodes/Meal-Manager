@@ -10,7 +10,6 @@ import {useNavigate} from "react-router-dom"
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  // const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -76,7 +75,7 @@ export const useRegister = () => {
 };
 
 export const useLogout = () => {
-  // const navigate = useNavigate(); // ✅ correct
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -89,7 +88,7 @@ export const useLogout = () => {
       toast.success('Logged out successfully');
 
       setTimeout(() => {
-        window.location.href='/'; // ✅ correct
+        navigate("/")
       }, 500);
     },
 

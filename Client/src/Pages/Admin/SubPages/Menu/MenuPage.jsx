@@ -151,8 +151,33 @@ const grouped = fetchedItems.reduce((acc, item) => {
           </div>
         </div>
 
+        
+        {/* ── Slot stat boxes ── */}
+        <div className="mt-5 hidden sm:grid sm:grid-cols-3 gap-4">
+          {SLOTS.map((slot) => {
+            const slotItems = menu[slot];
+            const total     = slotItems.reduce((a, i) => a + i.price, 0);
+            const isActive  = tab === slot;
+            const preview   = slotItems.slice(0, 2).map((i) => i.name).join(", ");
+            const more      = slotItems.length > 2 ? ` +${slotItems.length - 2} more` : "";
+            return (
+            <>
+            <MenuStat
+              setTab={setTab}
+              times={times}
+              slotItems={slotItems}
+              preview={preview}
+              more={more}
+              isActive={isActive}
+              slot={slot}
+            />
+            </>
+            );
+          })}
+        </div>
+
      
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mt-10">
 
         
           <div className="flex border-b border-gray-200">
@@ -176,7 +201,7 @@ const grouped = fetchedItems.reduce((acc, item) => {
             })}
           </div>
 
-          <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50">
+          <div className="flex items-center justify-between px-5 mt-5 py-3 border-b border-gray-100 bg-gray-50">
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-400">Serving time</span>
               <input
@@ -193,6 +218,8 @@ const grouped = fetchedItems.reduce((acc, item) => {
               Add item
             </button>
           </div>
+
+          
 
           {/* Table */}
           {items.length > 0 ? (
@@ -262,29 +289,6 @@ const grouped = fetchedItems.reduce((acc, item) => {
           )}
         </div>
 
-        {/* ── Slot stat boxes ── */}
-        <div className="mt-5 grid grid-cols-3 gap-4">
-          {SLOTS.map((slot) => {
-            const slotItems = menu[slot];
-            const total     = slotItems.reduce((a, i) => a + i.price, 0);
-            const isActive  = tab === slot;
-            const preview   = slotItems.slice(0, 2).map((i) => i.name).join(", ");
-            const more      = slotItems.length > 2 ? ` +${slotItems.length - 2} more` : "";
-            return (
-            <>
-            <MenuStat
-              setTab={setTab}
-              times={times}
-              slotItems={slotItems}
-              preview={preview}
-              more={more}
-              isActive={isActive}
-              slot={slot}
-            />
-            </>
-            );
-          })}
-        </div>
 
       </div>
 

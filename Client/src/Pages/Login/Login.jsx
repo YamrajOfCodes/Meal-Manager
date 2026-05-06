@@ -140,6 +140,7 @@ const registerUserFields = [
   { id: "city", label: "City", type: "text", ph: "Enter your city" },
   { id: "messCode", label: "Mess code", type: "text", ph: "Code from your mess owner" },
   { id: "address", label: "Address", type: "text", ph: "Enter your address" },
+  { id: "advance", label: "Advance", type: "text", ph: "Enter collected advance" },
 ];
 
 const stats = [

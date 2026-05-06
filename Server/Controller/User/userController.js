@@ -13,7 +13,17 @@ export const PlaceOrder = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        user.payment += items[0].price;;
+        const {advance} = user;
+
+        if(advance > items[0].price){
+            user.advance -= items[0].price;
+        }else{
+            let data = items[0].price - advance;
+            user.advance = 0
+            user.payment += data;
+        }
+
+        
         await user.save();
    
 

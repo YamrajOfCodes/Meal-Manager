@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import OrderRow from "../../../../components/AdminComponents/OrderRow/OrderRow";
+import MobileOrderCard from "../../../../components/AdminComponents/MobileCards/MobileOrderCard";
 
 /* ─── tiny helpers ─── */
 const MEAL_EMOJI  = { Breakfast:"☀️", Lunch:"🍛", Dinner:"🌙" };
@@ -243,80 +244,70 @@ const stats = useMemo(() => {
             ))}
           </div>
 
-          {/* status filter */}
-          <div style={{display:"flex",gap:4,flexWrap:"wrap",marginLeft:"auto"}}>
-            {statuses.map(s=>(
-              <button key={s}
-                className={`filter-chip ${statusTab===s?"active":""}`}
-                onClick={()=>setStatusTab(s)}>
-                {s}
-              </button>
-            ))}
-          </div>
+
+
         </div>
 
         {/* sort bar */}
-        <div style={{
-          display:"flex", gap:4, padding:"8px 16px",
-          borderBottom:"1px solid #f0ebe3",
-          background:"#faf8f5",
-        }}>
-          <span style={{fontSize:11,color:"#9a8f82",fontWeight:600,marginRight:6,lineHeight:"28px"}}>
-            Sort by:
-          </span>
-          {[
-            {key:"time",  label:"Latest"},
-            {key:"amount",label:"Amount"},
-            {key:"name",  label:"Name"},
-          ].map(s=>(
-            <button key={s.key}
-              className={`filter-chip ${sortKey===s.key?"active":""}`}
-              onClick={()=>setSortKey(s.key)}
-              style={{fontSize:11}}>
-              {sortKey===s.key && <span style={{marginRight:3}}>↓</span>}
-              {s.label}
-            </button>
-          ))}
-          <span style={{marginLeft:"auto",fontSize:11,color:"#9a8f82",lineHeight:"28px"}}>
-            {filtered.length} result{filtered.length!==1?"s":""}
-          </span>
-        </div>
+     <div className="hidden sm:flex gap-1 px-4 py-2 border-b border-[#f0ebe3] bg-[#faf8f5] items-center">
+  <span className="text-[11px] text-[#9a8f82] font-semibold mr-1.5 leading-7">
+    Sort by:
+  </span>
+  {[
+    { key: "time",   label: "Latest" },
+    { key: "amount", label: "Amount" },
+    { key: "name",   label: "Name"   },
+  ].map(s => (
+    <button key={s.key}
+      className={`filter-chip ${sortKey === s.key ? "active" : ""} text-[11px]`}
+      onClick={() => setSortKey(s.key)}>
+      {sortKey === s.key && <span className="mr-0.5">↓</span>}
+      {s.label}
+    </button>
+  ))}
+  <span className="ml-auto text-[11px] text-[#9a8f82] leading-7">
+    {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+  </span>
+</div>
 
         {/* table */}
-        {isEmpty ? (
-          <div style={{padding:"56px 20px",textAlign:"center"}}>
-            <div style={{fontSize:36,marginBottom:12}}>🍽</div>
-            <p style={{margin:0,fontSize:14,fontWeight:700,color:"#1c1812"}}>No orders found</p>
-            <p style={{margin:"6px 0 0",fontSize:12,color:"#9a8f82"}}>
-              Try adjusting your filters or search query
-            </p>
-          </div>
-        ) : (
-          <div style={{overflowX:"auto"}}>
-            <table style={{width:"100%",borderCollapse:"collapse",minWidth:700}}>
-              <thead>
-                <tr style={{borderBottom:"2px solid #f0ebe3",background:"#faf8f5"}}>
-                  {["#","Customer","Meal","Item(s)","Amount","Status","Time",""].map((h,i)=>(
-                    <th key={i} style={{
-                      padding:"9px 16px",
-                      fontSize:11, fontWeight:700, color:"#9a8f82",
-                      textTransform:"uppercase", letterSpacing:.5,
-                      textAlign: (i===4||i===6) ? "right" : "left",
-                      whiteSpace:"nowrap",
-                    }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((order,i)=>(
-                  <OrderRow key={order._id ?? i} order={order} index={i}/>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+       {isEmpty ? (
+  <div className="py-14 px-5 text-center">
+    <div className="text-4xl mb-3">🍽</div>
+    <p className="text-[14px] font-bold text-[#1c1812] m-0">No orders found</p>
+    <p className="text-[12px] text-[#9a8f82] mt-1.5">Try adjusting your filters or search query</p>
+  </div>
+) : (
+  <>
+    {/* desktop */}
+    <div className="hidden md:block overflow-x-auto">
+      <table className="w-full border-collapse" style={{ minWidth: 700 }}>
+        <thead>
+          <tr className="border-b-2 border-[#f0ebe3] bg-[#faf8f5]">
+            {["#", "Customer", "Meal", "Item(s)", "Amount", "Status", "Time", ""].map((h, i) => (
+              <th key={i} className={`px-4 py-2.5 text-[11px] font-bold text-[#9a8f82] uppercase tracking-wide whitespace-nowrap
+                ${i === 4 || i === 6 ? "text-right" : "text-left"}`}>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((order, i) => (
+            <OrderRow key={order._id ?? i} order={order} index={i} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    {/* mobile */}
+    <div className="flex flex-col gap-3 p-3 md:hidden">
+      {filtered.map((order, i) => (
+        <MobileOrderCard key={order._id ?? i} order={order} index={i} />
+      ))}
+    </div>
+  </>
+)}
       </div>
     </div>
   );

@@ -23,38 +23,47 @@ const OverViewPage = ({
       <div className="slide flex flex-col gap-5">
 
             {/* hero banner */}
-            <div className="rounded-2xl relative overflow-hidden flex items-center justify-between gap-4"
+            <div className="rounded-2xl relative overflow-hidden flex flex-col gap-4"
               style={{background:"linear-gradient(120deg,#c2620a 0%,#e07b20 65%,#f0a050 100%)", padding:"24px 28px"}}>
-              <div className="relative z-10">
-                <h1 className="text-2xl text-white font-bold leading-tight" style={{fontFamily:"'Lora',serif"}}>
-                  Hello, {user}
-                </h1>
-                <p className="text-white/70 text-[13px] mt-1">{today}</p>
-                <div className="flex gap-3 mt-4 flex-wrap">
-                  <button onClick={()=>setTab("menu")}
-                    className="bg-white text-[#c2620a] text-[12px] font-bold px-5 py-2.5 rounded-full hover:bg-[#fff4e8] transition-colors">
-                    Order Now →
-                  </button>
-                  <button onClick={()=>setTab("orders")}
-                    className="text-white border border-white/30 text-[12px] font-semibold px-5 py-2.5 rounded-full hover:bg-white/10 transition-colors">
-                    My Orders
-                  </button>
+              
+              <div className="relative z-10 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h1 className="text-2xl text-white font-bold leading-tight" style={{fontFamily:"'Lora',serif"}}>
+                    Hello, {user?.name}
+                  </h1>
+                  <p className="text-white/70 text-[13px] mt-1">{today}</p>
+                  <div className="flex gap-3 mt-4 flex-wrap">
+                    <button onClick={()=>setTab("menu")}
+                      className="bg-white text-[#c2620a] text-[12px] font-bold px-5 py-2.5 rounded-full hover:bg-[#fff4e8] transition-colors">
+                      Order Now →
+                    </button>
+                    <button onClick={()=>setTab("orders")}
+                      className="text-white border border-white/30 text-[12px] font-semibold px-5 py-2.5 rounded-full hover:bg-white/10 transition-colors">
+                      My Orders
+                    </button>
+                  </div>
                 </div>
               </div>
-              {/* decorative orbs */}
+
+              <div className="relative z-10 grid grid-cols-2 gap-3">
+                {[
+                  { label: "Advance Due", value: user?.advance },
+                  { label: "Balance Due", value: <CountUp value={totalPrice}/> },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-white/15 border border-white/20 rounded-xl px-4 py-3 backdrop-blur">
+                    <div className="flex flex-col">
+                      <p className="text-[10px] text-white/60 uppercase tracking-wider font-semibold leading-none">{item.label}</p>
+                      <p className="text-[22px] font-bold text-white leading-tight mt-0.5">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <div className="absolute right-[-24px] top-[-24px] w-40 h-40 rounded-full bg-white/10 pointer-events-none"/>
               <div className="absolute right-[56px] bottom-[-48px] w-28 h-28 rounded-full bg-white/06 pointer-events-none"/>
-              {/* floating balance */}
-              <div className="relative z-10 bg-white/18 border border-white/25 rounded-2xl px-5 py-4 text-center backdrop-blur shrink-0">
-                <p className="text-[10px] text-white/60 uppercase tracking-wider font-semibold">Balance Due</p>
-                <p className="text-[28px] font-bold text-white leading-none mt-1">
-                  <CountUp value={totalPrice}/>
-                </p>
-              </div>
             </div>
 
-            {/* KPIs */}
-            <div className="grid grid-cols-2 sm:grid-cols-3  gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {[
                 {
                   label:"Balance Due", val:<CountUp value={balance}/>, sub:"Total to pay this month",
@@ -74,25 +83,24 @@ const OverViewPage = ({
                   iconBg:"bg-[#fdecea]", iconC:"#c0392b",
                   chipLabel:"Active", chipCls:"bg-[#fdecea] text-[#c0392b]",
                 },
-              ].map((k,i)=>(
-                <div key={i} className="card p-5 flex flex-col gap-3">
+              ].map((element,index)=>(
+                <div key={index} className="card p-5 flex flex-col gap-3">
                   <div className="flex items-center justify-between">
-                    <div className={`w-10 h-10 rounded-xl ${k.iconBg} flex items-center justify-center`}>
-                      <Ic d={k.iconD} s={17} c={k.iconC}/>
+                    <div className={`w-10 h-10 rounded-xl ${element.iconBg} flex items-center justify-center`}>
+                      <Ic d={element.iconD} s={17} c={element.iconC}/>
                     </div>
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${k.chipCls}`}>
-                      {k.chipLabel}
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${element.chipCls}`}>
+                      {element.chipLabel}
                     </span>
                   </div>
                   <div>
-                    <p className="text-[27px] font-bold text-[#1c1812] leading-none tracking-tight">{k.val}</p>
-                    <p className="text-[13px] font-semibold text-[#1c1812] mt-1">{k.label}</p>
-                    <p className="text-[11px] text-[#9a8f82] mt-0.5">{k.sub}</p>
+                    <p className="text-[27px] font-bold text-[#1c1812] leading-none tracking-tight">{element.val}</p>
+                    <p className="text-[13px] font-semibold text-[#1c1812] mt-1">{element.label}</p>
+                    <p className="text-[11px] text-[#9a8f82] mt-0.5">{element.sub}</p>
                   </div>
                 </div>
               ))}
             </div>
-
 
             {/* notices */}
             <div className="card overflow-hidden">

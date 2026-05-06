@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export const RegisterUser = async (req, res) => {
   try {
-    const { name, email, password, phone, city, role, messName, messCode,address } = req.body;
+    const { name, email, password, phone, city, role, messName, messCode,address,advance } = req.body;
 
     if (!name || !email || !password || !phone || !city || !role || !address) {
       return res.status(400).json({ message: "All required fields must be filled" });
@@ -45,6 +45,7 @@ export const RegisterUser = async (req, res) => {
       messName,
       messCode,
       payment:0,
+      advance:advance ||0,
       label:{
        labelName:"",
        labelPrice:""
@@ -87,7 +88,7 @@ export const RegisterUser = async (req, res) => {
 
     const validUser = await User.findOne({ email });
     if (!validUser) {
-        return res.status(400).json({ error: "invalid credentials" });
+        return res.status(400).json({ error: "user is not exists, please register first" });
     }
 
     const validpassword = await bcrypt.compare(password, validUser.password);

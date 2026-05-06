@@ -229,6 +229,7 @@ export const getallLables = async(req,res)=>{
   try {
     const {userId} = req.params;
     const getlabels = await DiscountLabel.findOne({_id:userId});
+    console.log(getlabels);
     return res.status(200).json(getlabels);
   } catch (error) {
     console.log(error);
