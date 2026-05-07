@@ -2,7 +2,7 @@ import { CardHead, DueRow, MenuRow } from "../../../../components/AdminComponent
 import { CardWrap } from "../../../../components/AdminComponents/Shared/SharedComponents";
 import { ChipBadge } from "../../../../components/AdminComponents/Shared/SharedComponents";
 
-function OverviewPage({ setPage,fetchedMenuItems,users,orders }) {
+function OverviewPage({ setPage,fetchedMenuItems,users,orders,individual }) {
 
   const DUES = [
   { name:"Sneha Desai",    av:"SD", hue:"#7c3aed", since:"8 days",  amt:"₹1,800" },
@@ -57,7 +57,7 @@ const grouped = fetchedMenuItems.reduce((acc, item) => {
   return acc;
 },[]);
 
-console.log(grouped)
+console.log(users)
 
 
   return (
@@ -72,8 +72,8 @@ console.log(grouped)
           style={{ background: "rgba(255,255,255,.08)" }}
         />
         <div className="relative z-10">
-          <div className="text-white text-xl font-serif">Hello {users?.name}</div>
-          <div className="text-white/75 text-xs mt-1">Here's what's happening at Patil Mess today.</div>
+          <div className="text-white text-xl font-serif">Hello {individual?.name}</div>
+          <div className="text-white/75 text-xs mt-1">Here's what's happening at {individual?.name}'s mess today.</div>
         </div>
         <div
           className="relative z-10 text-center px-5 py-3 rounded-[9px] hidden sm:block"

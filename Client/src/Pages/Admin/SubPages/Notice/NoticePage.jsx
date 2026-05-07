@@ -3,6 +3,7 @@ import { CardHead, CardWrap } from "../../../../components/AdminComponents/Share
 import { useGetNotices, usePostNotice } from "../../../../hooks/Admin/adminHooks";
 import { jwtDecode } from "jwt-decode";
 import Loader from "../../../../components/AdminComponents/Shared/Loader";
+import toast from "react-hot-toast";
 
 function NoticesPage() {
 
@@ -35,15 +36,20 @@ const TYPE_META = {
   const [notices, setNotices] = useState();
 
   const postNotice = () => {
-    setLoader(true)
-    if (!noticeText.trim()) return;
+    if (!noticeText.trim()){
+      toast.error("please add something");
+      return;
+    }
+    
     setNotices([{ id: Date.now(), text: noticeText, type: noticeType, time: "Just now" }]);
+    
+    const data = {
+      text: notices?.[0]?.text || "",
+      type: notices?.[0]?.type || "",
+      messCode
+    };
 
-   const data = {
-  text: notices?.[0]?.text || "",
-  type: notices?.[0]?.type || "",
-  messCode
-};
+    setLoader(true)
     postNoticess(data,{
       onSuccess:()=>{
         setLoader(false)

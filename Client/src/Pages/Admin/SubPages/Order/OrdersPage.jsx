@@ -50,6 +50,8 @@ function OrdersPage({ orders = [] }) {
 
   const [Revenues,setRevenue] = useState(0);
 
+  console.log(orders);
+
 const filtered = useMemo(() => {
   let list = orders.filter((order) => {
     return (

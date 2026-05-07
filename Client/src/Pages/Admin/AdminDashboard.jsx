@@ -13,6 +13,7 @@ import Complaints from "./SubPages/Complaints/Complaints";
 import AdminComplaintsPage from "./SubPages/Complaints/Complaints";
 import Loader from "../../components/AdminComponents/Shared/Loader";
 import LabelsPage from "./SubPages/Label/LabelsPage ";
+import { useNavigate } from "react-router-dom";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -24,8 +25,19 @@ const NAV = [
   { key:"orders",    label:"Orders",   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> },
   { key:"payments",  label:"Payments", dot:true, icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
   { key:"notices",   label:"Notice",   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg> },
-  { key:"menu",      label:"Menu",     icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg> },
 { 
+  key: "menu", 
+  label: "Menu", 
+  icon: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="7" y1="2" x2="7" y2="8"/>
+      <path d="M5 2v3a2 2 0 0 0 4 0V2"/>
+      <line x1="7" y1="10" x2="7" y2="22"/>
+      <path d="M17 2v10c0 1.1-.9 2-2 2h0"/>
+      <line x1="17" y1="14" x2="17" y2="22"/>
+    </svg>
+  )
+},{ 
   key: "complaints", 
   label: "Complaints", 
   icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -56,6 +68,7 @@ export default function MessDashboard() {
   const login = localStorage.getItem("login");
   const {mutate:logout} = useLogout();
   const decoded = jwtDecode(login);
+  const navigate = useNavigate();
   // console.log("Login token:", decoded);
   const messCode = decoded.messCode;
   // console.log(messCode)
@@ -68,11 +81,19 @@ export default function MessDashboard() {
 
   console.log("ownerData",ownerData);
 
-  // Add this logout handler near the top of MessDashboard component (around line 44)
-const handleLogout = () => {
- logout();
+ const handleLogout = () => {
+  logout(undefined, {
+    onSuccess: () => {
+      localStorage.removeItem("login");
+      navigate("/");
+    },
+    onError: () => {
+      localStorage.removeItem("login");
+      navigate("/");
+    }
+  });
 };
-  
+
   
 
   const pageTitle =
@@ -159,15 +180,16 @@ const handleLogout = () => {
           </div>
           <div className="flex items-center gap-2">
             {page === "orders" && (
-              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[9px] bg-[#c2620a] text-white text-xs font-semibold border-none cursor-pointer hover:bg-[#a8520a] transition-colors" style={{ boxShadow: "0 2px 8px rgba(194,98,10,.25)" }}>
+              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[9px] bg-[#c2620a] text-white text-xs font-semibold border-none cursor-pointer hover:bg-[#a8520a] transition-colors" style={{ boxShadow: "0 2px 8px rgba(194,98,10,.25)" }}onClick={handleLogout}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                Add Customer
+                {/* Add Customer */}
+                Logout
               </button>
             )}
             {page === "overview" && (
-              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[9px] border border-[#e8e2d9] bg-transparent text-[#5a5048] text-xs font-semibold cursor-pointer hover:bg-[#faf8f5] transition-colors">
+              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[9px] border border-[#e8e2d9] bg-transparent text-[#5a5048] text-xs font-semibold cursor-pointer hover:bg-[#faf8f5] transition-colors" onClick={handleLogout}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 8l-4-4-4 4M12 4v12"/></svg>
-                Export
+                Logout
               </button>
             )}
           </div>
@@ -175,7 +197,7 @@ const handleLogout = () => {
 
         {/* Page content */}
         <div className="p-7 pb-24 md:pb-24 pb-24 flex flex-col gap-5 overflow-y-auto md:px-7 px-4">
-          {page === "overview"  && <OverviewPage setPage={setPage} fetchedMenuItems={fetchedItems} users={getallUsers} orders={getAllOrders} />}
+          {page === "overview"  && <OverviewPage setPage={setPage} fetchedMenuItems={fetchedItems} users={getallUsers} individual={ownerData} orders={getAllOrders}/>}
           {page === "orders"    && <OrdersPage orders={getAllOrders}/>}
           {page === "payments"  && <PaymentsPage users={getallUsers} setLoading={setLoader} />}
           {page === "notices"   && <NoticesPage />}

@@ -207,6 +207,8 @@ function formatTime(iso) {
                   { label:"Placed",   val: new Date(order.createdAt).toLocaleString("en-IN",{
                       day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"
                     }) },
+                     { label:"Address",     val: order?.address ?? "—" },
+                    
                 ].map(m => (
                   <div key={m.label} style={{
                     background:"white", border:"1px solid #ede8e0",

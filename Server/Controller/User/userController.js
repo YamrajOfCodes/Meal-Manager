@@ -37,6 +37,7 @@ export const PlaceOrder = async (req, res) => {
             messCode,
             userId,
             mealTime,
+            address:user.address
         });
 
         await newOrder.save();
