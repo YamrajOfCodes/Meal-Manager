@@ -10,6 +10,7 @@ import { jwtDecode } from "jwt-decode";
 import { useGetNotices } from "../../hooks/Admin/adminHooks";
 import { useGetUserData, useLogout } from "../../hooks/authHooks/authHooks";
 import Loader from "../../components/AdminComponents/Shared/Loader";
+import { useNavigate } from "react-router-dom";
 
 /* ─────────────────────────────────────────────
    MOCK API DATA  (matches your API shape exactly)

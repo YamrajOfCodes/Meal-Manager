@@ -11,7 +11,7 @@ export const RegisterUser = async (req, res) => {
     }
 
     if(phone.length < 10 || phone.length>10){
-      return res.status(400).json({error:"please enter invalid phone number"});
+      return res.status(400).json({error:"please enter valid phone number"});
     }
     if (role == "customer") {
       const findMessCode = await User.findOne({
