@@ -108,7 +108,7 @@ const OverViewPage = ({
                 <p className="font-semibold text-[14px] text-[#1c1812]">📢 Mess Notices</p>
               </div>
                {
-                notices?.map((n,i)=>{
+                notices?.length > 0 ?   notices?.map((n,i)=>{
                   return(
                     <>
                      <div key={i} className="flex gap-3 px-5 py-3.5 border-b border-[#ebe6de] last:border-0">
@@ -125,7 +125,9 @@ const OverViewPage = ({
                 </div>
                     </>
                   )
-                })
+                }) : <div className="h-20 flex justify-center items-center">
+                    <p>No notices from mess</p>
+                  </div>
                }
             </div>
           </div>

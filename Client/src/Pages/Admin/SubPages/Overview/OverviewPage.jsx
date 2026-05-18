@@ -75,13 +75,13 @@ console.log(users)
           <div className="text-white text-xl font-serif">Hello {individual?.name}</div>
           <div className="text-white/75 text-xs mt-1">Here's what's happening at {individual?.name}'s mess today.</div>
         </div>
-        <div
+        {/* <div
           className="relative z-10 text-center px-5 py-3 rounded-[9px] hidden sm:block"
           style={{ background: "rgba(255,255,255,.18)", border: "1px solid rgba(255,255,255,.25)", backdropFilter: "blur(8px)" }}
         >
           <div className="text-white text-2xl font-bold tracking-tight">48</div>
           <div className="text-white/70 text-[10px] uppercase tracking-widest mt-0.5 font-medium">Orders today</div>
-        </div>
+        </div> */}
       </div>
 
       {/* KPIs */}
@@ -94,7 +94,7 @@ console.log(users)
           <div key={i} className="bg-white border border-[#e8e2d9] rounded-[14px] p-[18px] shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="w-9 h-9 rounded-[10px] flex items-center justify-center" style={{ background: k.iconBg }}>{k.icon}</div>
-              <ChipBadge type={k.chip}>{k.chipLabel}</ChipBadge>
+              {/* <ChipBadge type={k.chip}>{k.chipLabel}</ChipBadge> */}
             </div>
             <div>
               <div className="text-2xl font-bold text-[#1a1510] tracking-tight leading-none">{k.num}</div>
@@ -132,11 +132,13 @@ console.log(users)
         </CardWrap> */}
 
         <CardWrap>
-          <CardHead title="Payments Due" right={<ChipBadge type="chip-red">3 overdue</ChipBadge>} />
+          <CardHead title="Payments Due" right={<ChipBadge type="chip-red">{users?.length} overdue</ChipBadge>} />
           <div className="px-4 pb-3 pt-1">
-            {users?.map(due => (
+            {users?.length > 0 ? users?.map(due => (
               <DueRow key={due.name} Due={due} />
-            ))}
+            )) :  <div className="h-20 flex justify-center items-center">
+              <p>No OverDue Payments</p>
+            </div> }
           </div>
         </CardWrap>
 
@@ -146,7 +148,11 @@ console.log(users)
           <button className="text-[11px] font-semibold text-[#c2620a] cursor-pointer" onClick={() => setPage("menu")}>Edit menu →</button>
         } />
         <div className="px-5 pb-2 pt-1">
-          {grouped?.map(meal => <MenuRow key={meal.name} meal={meal} />)}
+          {
+            grouped?.length > 0 ?grouped?.map(meal => <MenuRow key={meal.name} meal={meal} />) : <div className="h-20 flex justify-center items-center">
+              <p>No menu posted for today</p>
+            </div>
+          }
         </div>
       </CardWrap>
       </div>
