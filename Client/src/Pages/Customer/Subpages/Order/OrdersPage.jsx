@@ -324,7 +324,7 @@ export default function OrdersPage({ orders = MOCK, balance: balProp }) {
 
       {/* ── WRAPPER: 90% desktop / 100% mobile ── */}
       <div className="slide" style={{
-        width: "90%", maxWidth: 1200, margin: "0 auto",
+        width: "98%", maxWidth: 1200, margin: "0 auto",
         padding: "24px 0 48px",
         display: "flex", flexDirection: "column", gap: 20,
         fontFamily: "'Outfit',sans-serif",

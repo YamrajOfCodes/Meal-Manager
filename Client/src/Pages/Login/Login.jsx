@@ -307,7 +307,7 @@ const handleLogin = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-stone-900 leading-tight">MessMate</p>
-              <p className="text-[11px] text-stone-400">Your mess, managed.</p>
+              <p className="text-[11px] text-stone-400">modern mess management solution.</p>
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ClipboardList, Home, MessageCircle, ShoppingCart, UtensilsCrossed } from "lucide-react"
+import { ClipboardList, Coffee, Home, MessageCircle, Moon, ShoppingCart, Sun, UtensilsCrossed } from "lucide-react"
 import MenuPage from "./Subpages/Menu/MenuPage";
 import CartPage from "./Subpages/Cart/CartPage";
 import OrdersPage from "./Subpages/Order/OrdersPage";
@@ -33,7 +33,12 @@ const MOCK_MENU = [
 ];
 
 const MEAL_ORDER = ["Breakfast", "Lunch", "Snacks", "Dinner"];
-const MEAL_EMOJI = { Breakfast: "☀️", Lunch: "🍛", Snacks: "🫖", Dinner: "🌙" };
+const MEAL_ICONS = {
+  Breakfast: Sun,
+  Lunch:     UtensilsCrossed,
+  Snacks:    Coffee,
+  Dinner:    Moon,
+};
 
 const COMPLAINT_CATS = [
   "Food Quality", "Late Delivery", "Quantity Issue",
@@ -595,7 +600,7 @@ const NAV = [
         {/* ─────────── MENU / ORDER ─────────── */}
         {tab === "menu" && (
           <MenuPage
-            MEAL_EMOJI={MEAL_EMOJI}
+            MEAL_EMOJI={MEAL_ICONS}
             MEAL_ORDER={MEAL_ORDER}
             grouped={grouped}
             mealFilter={mealFilter} setMealFilter={setMealFilter}

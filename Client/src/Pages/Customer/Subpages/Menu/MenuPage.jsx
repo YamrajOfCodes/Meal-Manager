@@ -1,4 +1,8 @@
 import React, { useRef, useEffect } from 'react'
+import {
+  Sun, UtensilsCrossed, Coffee, Moon,
+  Utensils, Salad, SlidersHorizontal, Leaf
+} from 'lucide-react'
 
 const MEAL_TIME_LABEL = {
   Breakfast: "7:00 – 10:00 AM",
@@ -7,10 +11,25 @@ const MEAL_TIME_LABEL = {
   Dinner:    "7:00 – 10:00 PM",
 }
 
+/* Lucide icon map — replaces MEAL_EMOJI */
+const MEAL_ICON = {
+  All:       Utensils,
+  Breakfast: Sun,
+  Lunch:     UtensilsCrossed,
+  Snacks:    Coffee,
+  Dinner:    Moon,
+}
+
+/* Renders the correct Lucide icon for a meal key */
+function MealIcon({ meal, size = 18, color = "#c2620a" }) {
+  const Icon = MEAL_ICON[meal] ?? Utensils
+  return <Icon size={size} strokeWidth={1.8} color={color} />
+}
+
 const MenuPage = ({
   mealFilter,
   setMealFilter,
-  MEAL_EMOJI,
+  MEAL_EMOJI,   // kept in props signature for backward-compat; not used
   MEAL_ORDER,
   vegOnly,
   setVegOnly,
@@ -25,11 +44,8 @@ const MenuPage = ({
   setTab,
   loginUser
 }) => {
-  const tabsRef = useRef(null)
+  const tabsRef    = useRef(null)
   const sectionRefs = useRef({})
-
-
-  console.log(grouped)
 
   // Auto-scroll active tab into view
   useEffect(() => {
@@ -53,6 +69,7 @@ const MenuPage = ({
         {/* Veg toggle row */}
         <div className="flex items-center justify-end px-4 py-2 border-b border-[#f0ebe3]">
           <label className="flex items-center gap-2 cursor-pointer select-none">
+            <Leaf size={13} strokeWidth={2} color={vegOnly ? '#3B6D11' : '#9a8f82'} />
             <span className="text-[12px] font-medium text-[#6b6157]">Veg only</span>
             <div
               onClick={() => setVegOnly(v => !v)}
@@ -89,7 +106,13 @@ const MenuPage = ({
                     : 'border-transparent text-[#9a8f82] hover:text-[#5a5048]'
                 }`}
               >
-                <span className="text-xl leading-none">{MEAL_EMOJI[m] ?? '🍽'}</span>
+                {/* Icon pill replacing emoji */}
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200 ${
+                  isActive ? 'bg-[#fdebd8]' : 'bg-[#f5f0e8]'
+                }`}>
+                  <MealIcon meal={m} size={16} color={isActive ? '#c2620a' : '#9a8f82'} />
+                </div>
+
                 <span className={`text-[11px] font-semibold tracking-wide uppercase ${isActive ? 'text-[#c2620a]' : 'text-[#9a8f82]'}`}>
                   {m}
                 </span>
@@ -118,14 +141,13 @@ const MenuPage = ({
               key={meal}
               meal={meal}
               items={items}
-              emoji={MEAL_EMOJI[meal]}
               timeLabel={MEAL_TIME_LABEL[meal]}
               cart={cart}
               inc={inc}
               dec={dec}
               VegBox={VegBox}
               sectionRefs={sectionRefs}
-              discount = {loginUser?.label?.labelPrice}
+              discount={loginUser?.label?.labelPrice}
             />
           ))
         )}
@@ -144,7 +166,7 @@ const MenuPage = ({
                 {cartCount} {cartCount === 1 ? 'item' : 'items'}
               </span>
             </div>
-            <span className="text-[14px] font-bold tracking-wide cursor-pointer" onClick={()=>{setTab('cart')}}>View Cart</span>
+            <span className="text-[14px] font-bold tracking-wide cursor-pointer">View Cart</span>
             <span className="text-[14px] font-bold">₹{cartTotal}</span>
           </button>
         </div>
@@ -154,15 +176,15 @@ const MenuPage = ({
 }
 
 /* ── Meal section ── */
-const MealSection = ({ meal, items, emoji, timeLabel, cart, inc, dec, VegBox, sectionRefs,discount }) => (
+const MealSection = ({ meal, items, timeLabel, cart, inc, dec, VegBox, sectionRefs, discount }) => (
   <div
     ref={el => sectionRefs.current[meal] = el}
     className="bg-white rounded-2xl overflow-hidden border border-[#ede8e0]"
   >
     {/* Section header */}
     <div className="flex items-center gap-3 px-4 py-3.5 bg-[#faf7f3] border-b border-[#ede8e0]">
-      <div className="w-9 h-9 rounded-xl bg-[#fdebd8] flex items-center justify-center text-lg leading-none">
-        {emoji}
+      <div className="w-9 h-9 rounded-xl bg-[#fdebd8] flex items-center justify-center">
+        <MealIcon meal={meal} size={18} color="#c2620a" />
       </div>
       <div className="flex-1">
         <p className="text-[14px] font-bold text-[#1c1812]">{meal}</p>
@@ -193,7 +215,9 @@ const MealSection = ({ meal, items, emoji, timeLabel, cart, inc, dec, VegBox, se
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <p className="text-[14px] font-bold text-[#1c1812]">₹{ discount ? item.price - discount : item.price}</p>
+            <p className="text-[14px] font-bold text-[#1c1812]">
+              ₹{discount ? item.price - discount : item.price}
+            </p>
 
             {qty === 0 ? (
               <button
@@ -259,7 +283,9 @@ const LoadingSkeletons = () => (
 /* ── Empty state ── */
 const EmptyState = ({ vegOnly }) => (
   <div className="bg-white rounded-2xl border border-[#ede8e0] p-12 flex flex-col items-center gap-3 text-center">
-    <span className="text-4xl">🥗</span>
+    <div className="w-14 h-14 rounded-2xl bg-[#f5f0e8] flex items-center justify-center">
+      <Salad size={28} strokeWidth={1.5} color="#9a8f82" />
+    </div>
     <p className="text-[14px] font-semibold text-[#1c1812]">
       {vegOnly ? 'No veg items here' : 'Nothing here'}
     </p>
