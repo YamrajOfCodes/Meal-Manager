@@ -126,15 +126,13 @@ export const AssignLabel = (data) => {
   });
 }
 
-export const UnAssignLabel = (userId) => {
+export const UnAssignLabel = (data) => {
   const token = localStorage.getItem("login");
-  console.log(token);
-  return api.put(`/admin/unassignlabel/${userId}`,{},{  
+  return api.put(`/admin/unassignlabel/${data.userId}`, {}, {
     headers: {
       Authorization: `Bearer ${token}`
     }
   });
-}
-
+};
 
 

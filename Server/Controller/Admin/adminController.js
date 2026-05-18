@@ -250,35 +250,48 @@ export const deleteLabel = async(req,res)=>{
   }
 }
 
-export const AssignLabel = async(req,res)=>{
+// ── Assign label to a user ──
+export const AssignLabel = async (req, res) => {
   try {
-    const {labelName,discount,userId} = req.body
+    const { labelName, discount, userId } = req.body;
 
-    const getUser = await User.findById(userId);
-    console.log(getUser);
-    getUser.label.labelName = labelName;
-    getUser.label.labelPrice = discount;
-    await getUser.save();
-    return res.status(200).json("label is assigned");
+    if (!userId || !labelName || discount === undefined) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: { "label.labelName": labelName, "label.labelPrice": Number(discount) } },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    return res.status(200).json({ message: "Label assigned", user });
   } catch (error) {
-     console.log(error);
-    return res.status(400).json({error});
+    console.log(error);
+    return res.status(500).json({ error: error.message });
   }
-}
+};
 
-
-export const UnassignLabel = async(req,res)=>{
+// ── Remove label from a user ──
+export const UnassignLabel = async (req, res) => {
   try {
-    const {userId} = req.params;
+    const { userId } = req.params; // ✅ from URL param
 
-    const getUser = await User.findById(userId);
-    console.log(getUser);
-    getUser.label.labelName = "";
-    getUser.label.labelPrice = null;
-    await getUser.save();
-    return res.status(200).json("label is unassigned");
+    if (!userId) return res.status(400).json({ error: "userId is required" });
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: { "label.labelName": null, "label.labelPrice": 0 } },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    return res.status(200).json({ message: "Label removed", user });
   } catch (error) {
-     console.log(error);
-    return res.status(400).json({error});
+    console.log(error);
+    return res.status(500).json({ error: error.message });
   }
-}
+};

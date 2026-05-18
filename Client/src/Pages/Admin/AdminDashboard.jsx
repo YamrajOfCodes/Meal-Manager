@@ -76,7 +76,7 @@ export default function MessDashboard() {
   // console.log(messCode)
   const {data:getAllOrders} = useGetOrders(messCode)
   const {data:complaints} = useGetComplaints(messCode);
-  const {data:getallUsers} = useGetUsers(messCode);
+  const { data: getallUsers, refetch: refetchUsers } = useGetUsers(messCode);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
   const {data:ownerData} = useGetUserData(decoded?._id);
   const [loader,setLoader] = useState(false);
@@ -211,7 +211,7 @@ export default function MessDashboard() {
           {page === "complaints"&& <AdminComplaintsPage complaints={complaints} />}
           {page === "menu"      && <MenuPage />}
            {page === "customers"      && < CustomersPage users={getallUsers} />}
-           {page === "label"      && < LabelsPage users={getallUsers}/>}
+          {page === "label" && <LabelsPage users={getallUsers} refetchUsers={refetchUsers} />}
           {(page === "customers" || page === "reports" || page === "settings") && (
             <div className="flex items-center justify-center h-64 text-[#9a8f82] text-sm">
               {/* <CustomersPage/> */}
