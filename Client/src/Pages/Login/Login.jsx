@@ -246,7 +246,7 @@ const handleLogin = () => {
         <div className="relative z-10 mb-10">
           <div className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 text-[11px] font-medium px-3 py-1 rounded-full mb-4 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
-            Trusted by 500+ mess owners across India
+            Trusted by 5+ mess owners across Pune
           </div>
           <h1 className="font-serif text-4xl text-amber-950 leading-snug mb-3.5">
             "Complete Digital<br />
@@ -254,7 +254,7 @@ const handleLogin = () => {
             <span className="text-amber-700">Mess"</span>
           </h1>
           <p className="text-sm text-stone-500 leading-relaxed max-w-md">
-            Upgrade your mess operations in this digital era with TiffinTrack — increase
+            Upgrade your mess operations in this digital era with TiffinTrack, increase
             customer satisfaction, track deliveries in real-time, and grow your business
             effortlessly.
           </p>
@@ -306,7 +306,7 @@ const handleLogin = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-stone-900 leading-tight">MessMate</p>
+              <p className="text-sm font-medium text-stone-900 leading-tight">TifinTrack</p>
               <p className="text-[11px] text-stone-400">modern mess management solution.</p>
             </div>
           </div>
