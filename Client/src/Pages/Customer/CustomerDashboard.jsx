@@ -11,6 +11,7 @@ import { useGetNotices } from "../../hooks/Admin/adminHooks";
 import { useGetUserData, useLogout } from "../../hooks/authHooks/authHooks";
 import Loader from "../../components/AdminComponents/Shared/Loader";
 import { useNavigate } from "react-router-dom";
+import { protectRoute } from "../../utils/ProtectedRoutes/ProtectedRoutes";
 
 /* ─────────────────────────────────────────────
    MOCK API DATA  (matches your API shape exactly)
@@ -88,12 +89,12 @@ export default function UserDashboard() {
 
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("login");
+  useEffect(()=>{
+  protectRoute(navigate,"customer")
+   },[])
 
-  if (!token) {
-    navigate("/");
-    return null;
-  }
+
+  const token = localStorage.getItem("login");
 
   let decoded, messCode;
   try {
@@ -269,8 +270,8 @@ const placeOrder = () => {
       navigate("/");
     },
     onError: () => {
-      localStorage.removeItem("login");
-      navigate("/");
+        localStorage.removeItem("login");
+        navigate("/");
     }
   });
 };

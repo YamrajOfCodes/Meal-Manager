@@ -21,6 +21,8 @@ export const useLogin = () => {
 
       const decoded = jwtDecode(token);
 
+      console.log(decoded.role);
+
       if (decoded.role === 'owner') {
         navigate('/admin');
       } else if (decoded.role === 'customer') {

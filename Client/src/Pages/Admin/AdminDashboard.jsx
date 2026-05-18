@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OverviewPage from "./SubPages/Overview/OverviewPage";
 import OrdersPage from "./SubPages/Order/OrdersPage";
 import PaymentsPage from "./SubPages/Payments/PaymenntsPage";
@@ -14,6 +14,7 @@ import AdminComplaintsPage from "./SubPages/Complaints/Complaints";
 import Loader from "../../components/AdminComponents/Shared/Loader";
 import LabelsPage from "./SubPages/Label/LabelsPage ";
 import { useNavigate } from "react-router-dom";
+import { protectRoute } from "../../utils/ProtectedRoutes/ProtectedRoutes";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -65,21 +66,27 @@ const ACCOUNT_NAV = [
 
 export default function MessDashboard() {
   const [page, setPage] = useState("overview");
-  const login = localStorage.getItem("login");
+  const token = localStorage.getItem("login");
   const {mutate:logout} = useLogout();
-  const decoded = jwtDecode(login);
+  const decoded = token ? jwtDecode(token) : null;
+
   const navigate = useNavigate();
   // console.log("Login token:", decoded);
-  const messCode = decoded.messCode;
+  const messCode = decoded?.messCode;
   // console.log(messCode)
   const {data:getAllOrders} = useGetOrders(messCode)
   const {data:complaints} = useGetComplaints(messCode);
   const {data:getallUsers} = useGetUsers(messCode);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
-  const {data:ownerData} = useGetUserData(decoded._id);
+  const {data:ownerData} = useGetUserData(decoded?._id);
   const [loader,setLoader] = useState(false);
 
   console.log("ownerData",ownerData);
+
+
+  useEffect(()=>{
+     protectRoute(navigate,"owner");
+  },[navigate]);
 
  const handleLogout = () => {
   logout(undefined, {

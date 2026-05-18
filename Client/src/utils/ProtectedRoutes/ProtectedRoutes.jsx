@@ -1,26 +1,28 @@
-import jwt_decode from 'jwt-decode';
-
+import {jwtDecode} from "jwt-decode"
 
 export const protectRoute = (router, allowedRole) => {
   const token = localStorage.getItem('login');
+  console.log(token,allowedRole);
 
   if (!token || token === 'undefined' || token === 'null') {
     localStorage.removeItem('login');
-    router.replace('/');
+    router('/');
     return;
   }
 
   try {
-    const decoded = jwt_decode(token);
+    const decoded = jwtDecode(token);
 
-    if (isTokenExpired || decoded.role !== allowedRole) {
+    console.log(decoded.role,allowedRole);
+
+    if (decoded.role !== allowedRole) {
       localStorage.removeItem('login');
-      router.replace('/');
+      router('/');
       return;
     }
   } catch (error) {
     console.log(error);
     localStorage.removeItem('login');
-    router.replace('/');
+    router('/');
   }
 };

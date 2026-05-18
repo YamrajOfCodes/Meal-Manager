@@ -6,6 +6,8 @@ import ComplaintsPage from "./SubPages/Complaint/ComplaintPage";
 import AnalyticsPage from "./SubPages/Analytics/AnalyticsPage";
 import { useGetAllOwners } from "../../hooks/SuperAdmin/superAdminHooks";
 import { useLogout } from "../../hooks/authHooks/authHooks";
+import { protectRoute } from "../../utils/ProtectedRoutes/ProtectedRoutes";
+import { useNavigate } from "react-router-dom";
 
 /* ─── seed data ─────────────────────────────────────────────────── */
 const OWNERS_INIT = [
@@ -42,8 +44,8 @@ export default function SuperAdminDashboard(){
   const [page,   setPage]   = useState("overview");
   const {data:getOwnersData,isPending} = useGetAllOwners();
   const {mutate:logout} = useLogout();
-  console.log(getOwnersData);
   const [owners, setOwners] = useState(OWNERS_INIT);
+  const navigate = useNavigate();
 
   const active   = owners?.filter(o=>o.status==="active").length;
   const inactive = owners?.filter(o=>o.status==="inactive").length;
@@ -53,6 +55,11 @@ export default function SuperAdminDashboard(){
       setOwners(getOwnersData.data);
     }
   },[])
+
+
+    useEffect(()=>{
+       protectRoute(navigate,"superadmin");
+    },[]);
 
 
 const handleLogout = async () => {
