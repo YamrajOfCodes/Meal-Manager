@@ -144,9 +144,9 @@ const registerUserFields = [
 ];
 
 const stats = [
-  { num: "500+", label: "Mess owners" },
-  { num: "1.2L+", label: "Meals tracked daily" },
-  { num: "99.8%", label: "Uptime SLA" },
+  { num: "5+", label: "Mess owners" },
+  { num: "100+", label: "Meals tracked daily" },
+  { num: "99%", label: "Uptime SLA" },
   { num: "4.9★", label: "Avg. rating" },
 ];
 
