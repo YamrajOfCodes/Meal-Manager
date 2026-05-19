@@ -108,9 +108,9 @@ console.log(users)
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
         {[
-          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2620a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>, iconBg:"#fff4e8", num:`₹${totalOrdersPrice}`, label:"Today's collection",  chip:"chip-green", chipLabel:"+12% today" },
-          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>,       iconBg:"#fdecea",  num:`₹${yettoRecieve}`, label:"Amount pending",     chip:"chip-red",   chipLabel:"3 customers" },
-          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f5a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M12 7a4 4 0 100 8 4 4 0 000-8z"/></svg>, iconBg:"#e8f5ef", num:users?.length,      label:"Active customers",   chip:"chip-blue",  chipLabel:"2 on leave" },
+          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2620a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>, iconBg:"#fff4e8", num:`₹${totalOrdersPrice || 0}`, label:"Today's collection",  chip:"chip-green", chipLabel:"+12% today" },
+          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>,       iconBg:"#fdecea",  num:`₹${yettoRecieve || 0}`, label:"Amount pending",     chip:"chip-red",   chipLabel:"3 customers" },
+          { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f5a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M12 7a4 4 0 100 8 4 4 0 000-8z"/></svg>, iconBg:"#e8f5ef", num:users?.length || 0,      label:"Active customers",   chip:"chip-blue",  chipLabel:"2 on leave" },
         ].map((k, i) => (
           <div key={i} className="bg-white border border-[#e8e2d9] rounded-[14px] p-[18px] shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
