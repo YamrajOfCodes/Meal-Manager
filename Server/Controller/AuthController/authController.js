@@ -12,7 +12,7 @@ export const RegisterUser = async (req, res) => {
 
     const presentmessCode = await User.findOne({ messCode });
 
-    if(presentmessCode){
+    if(role === "customer" &&presentmessCode){
       return res.status(400).json({message:"Code already exists, please choose a different one"})
     }
 
