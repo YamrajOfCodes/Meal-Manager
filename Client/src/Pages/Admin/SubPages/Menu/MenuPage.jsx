@@ -136,8 +136,8 @@ const grouped = fetchedItems.reduce((acc, item) => {
   const del = (id) => setMenu((p) => ({ ...p, [tab]: p[tab].filter((i) => i.id !== id) }));
 
   return (
-    <div className="min-h-screen p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen p-4 sm:p-4">
+      <div className="w-full ">
         <div className="flex items-end justify-between mb-8">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
@@ -215,7 +215,7 @@ const grouped = fetchedItems.reduce((acc, item) => {
               className="flex items-center gap-1.5 text-xs font-bold text-white bg-gray-900 hover:bg-gray-700 transition-colors px-3.5 py-1.5 rounded-lg"
             >
               <Plus size={13} strokeWidth={2.5} />
-              Add item
+              Add
             </button>
           </div>
 
