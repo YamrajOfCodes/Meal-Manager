@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Avatar, CardWrap, ChipBadge } from "../../../../components/AdminComponents/Shared/SharedComponents";
+import { useGetUsers } from "../../../../hooks/Admin/adminHooks";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const getPaymentStatus = (user) => {
   if (user.payment === 0) return "paid";
@@ -7,11 +10,19 @@ const getPaymentStatus = (user) => {
   return "due";
 };
 
-const CustomersPage = ({ users = [] }) => {
+const CustomersPage = () => {
   const [search,       setSearch]  = useState("");
   const [statusFilter, setFilter]  = useState("all");
   const [sortKey,      setSortKey] = useState("name");
   const [sortDir,      setSortDir] = useState("asc");
+
+  const token = localStorage.getItem('login');
+  const decoded = token ? jwtDecode(token) : null;
+  const navigate = useNavigate();
+  const messCode = decoded?.messCode;
+
+   
+  const { data: users, refetch: refetchUsers } = useGetUsers(messCode);
 
   const toggleSort = (key) => {
     if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc");

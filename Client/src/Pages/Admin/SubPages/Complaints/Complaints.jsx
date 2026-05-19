@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useUpdateComplaint } from "../../../../hooks/Admin/adminHooks";
 import Loader from "../../../../components/AdminComponents/Shared/Loader";
+import { useGetComplaints } from "../../../../hooks/User/userHooks";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 // ── category visual config ───────────────────────────────────────
 const categoryConfig = {
@@ -71,9 +74,16 @@ function Dot() {
 }
 
 // ── main page ────────────────────────────────────────────────────
-export default function AdminComplaintsPage({complaints}) {
+export default function AdminComplaintsPage() {
+  
+  const token = localStorage.getItem('login');
+  const decoded = token ? jwtDecode(token) : null;
+  const navigate = useNavigate();
+  const messCode = decoded?.messCode;
+
   const [activeFilter, setActiveFilter] = useState("all");
   const {mutate:updatecomplaint} = useUpdateComplaint();
+  const {data:complaints} = useGetComplaints(messCode);
   const [loader, setLoading] = useState(false);
 
 
@@ -174,7 +184,7 @@ export default function AdminComplaintsPage({complaints}) {
 
         {/* body */}
         {
-          filteredComplaints.map(complaint => (
+       filteredComplaints?.length > 0 ?     filteredComplaints.map(complaint => (
             <div
               key={complaint._id}
               style={{
@@ -224,7 +234,10 @@ export default function AdminComplaintsPage({complaints}) {
               </select>
             </div>
           )
-        )}
+        ) : <div style={{ padding: 20, textAlign: "center", color: "#9a8f82" }}>
+          No complaints to show
+        </div>
+        }
       </div>
 
         {loader && (

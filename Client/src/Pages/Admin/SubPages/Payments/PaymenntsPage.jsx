@@ -1,14 +1,20 @@
 import { Edit } from "lucide-react";
 import { Avatar, CardHead, CardWrap, ChipBadge, DueRow, Pill } from "../../../../components/AdminComponents/Shared/SharedComponents";
 import { useState } from "react";
-import { useUpdatePayment } from "../../../../hooks/Admin/adminHooks";
+import { useGetUsers, useUpdatePayment } from "../../../../hooks/Admin/adminHooks";
 import Loader from "../../../../components/AdminComponents/Shared/Loader";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
-function PaymentsPage({ users }) {
+function PaymentsPage() {
 
-  console.log(users)
+  const token = localStorage.getItem("login");
+  const decoded = token ? jwtDecode(token) : null;
+  const navigate = useNavigate();
+  const messCode = decoded?.messCode;
 
   const {mutate:updatePayment,isPending:isUpdating} = useUpdatePayment();
+  const { data: users, refetch: refetchUsers } = useGetUsers(messCode);
 
   const [editId, setEditId] = useState(null);
   const [editText, setEditText] = useState("");
@@ -135,7 +141,8 @@ function PaymentsPage({ users }) {
       <CardWrap>
         <CardHead title="All Payments" />
         <div>
-          {users?.map((payment, idx) => (
+          {
+            users?.length > 0 ? users?.map((payment, idx) => (
             <div
               key={payment.name}
               className="group flex items-center gap-3 px-5 py-3.5 border-b border-[#ede8e1] last:border-0 hover:bg-[#faf8f5] transition-all duration-150"
@@ -190,7 +197,10 @@ function PaymentsPage({ users }) {
                 <Edit size={13} />
               </button>
             </div>
-          ))}
+          )) : <div className="h-20 flex justify-center items-center">
+            <p>No payment data available</p>
+          </div>
+          }
         </div>
       </CardWrap>
 

@@ -13,8 +13,10 @@ import Complaints from "./SubPages/Complaints/Complaints";
 import AdminComplaintsPage from "./SubPages/Complaints/Complaints";
 import Loader from "../../components/AdminComponents/Shared/Loader";
 import LabelsPage from "./SubPages/Label/LabelsPage ";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { protectRoute } from "../../utils/ProtectedRoutes/ProtectedRoutes";
+import { useLocation } from "react-router-dom";
 
 const TODAY_STR = new Date().toLocaleDateString("en-IN", {
   weekday: "long", day: "numeric", month: "long",
@@ -22,39 +24,39 @@ const TODAY_STR = new Date().toLocaleDateString("en-IN", {
 
 
 const NAV = [
-  { key:"overview",  label:"Home",     icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg> },
-  { key:"orders",    label:"Orders",   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> },
-  { key:"payments",  label:"Payments", dot:true, icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
-  { key:"notices",   label:"Notice",   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg> },
-{ 
-  key: "menu", 
-  label: "Menu", 
-  icon: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="7" y1="2" x2="7" y2="8"/>
-      <path d="M5 2v3a2 2 0 0 0 4 0V2"/>
-      <line x1="7" y1="10" x2="7" y2="22"/>
-      <path d="M17 2v10c0 1.1-.9 2-2 2h0"/>
-      <line x1="17" y1="14" x2="17" y2="22"/>
+  { key: "overview", label: "Home", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg> },
+  { key: "orders", label: "Orders", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg> },
+  { key: "payments", label: "Payments", dot: true, icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg> },
+  { key: "notices", label: "Notice", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" /></svg> },
+  {
+    key: "menu",
+    label: "Menu",
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="7" y1="2" x2="7" y2="8" />
+        <path d="M5 2v3a2 2 0 0 0 4 0V2" />
+        <line x1="7" y1="10" x2="7" y2="22" />
+        <path d="M17 2v10c0 1.1-.9 2-2 2h0" />
+        <line x1="17" y1="14" x2="17" y2="22" />
+      </svg>
+    )
+  }, {
+    key: "complaints",
+    label: "Complaints",
+    icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
-  )
-},{ 
-  key: "complaints", 
-  label: "Complaints", 
-  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    <line x1="12" y1="8" x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
-  </svg>
-},
-{ 
-  key: "label", 
-  label: "Labels", 
-  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-    <line x1="7" y1="7" x2="7.01" y2="7"/>
-  </svg>
-},
+  },
+  {
+    key: "label",
+    label: "Labels",
+    icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  },
 
 ];
 
@@ -67,12 +69,20 @@ const ACCOUNT_NAV = [
 export default function MessDashboard() {
   const [page, setPage] = useState("overview");
   const token = localStorage.getItem("login");
-  const {mutate:logout} = useLogout();
   const decoded = token ? jwtDecode(token) : null;
+  const messCode = decoded?.messCode;
+  const {mutate:logout} = useLogout();
+  const location = useLocation();
+
+  
+useEffect(() => {
+  const path = location.pathname.split("/")[2];
+
+  setPage(path || "overview");
+}, [location.pathname]);
 
   const navigate = useNavigate();
   // console.log("Login token:", decoded);
-  const messCode = decoded?.messCode;
   // console.log(messCode)
   const {data:getAllOrders} = useGetOrders(messCode)
   const {data:complaints} = useGetComplaints(messCode);
@@ -80,8 +90,6 @@ export default function MessDashboard() {
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
   const {data:ownerData} = useGetUserData(decoded?._id);
   const [loader,setLoader] = useState(false);
-
-  console.log("ownerData",ownerData);
 
 
   useEffect(()=>{
@@ -144,7 +152,9 @@ export default function MessDashboard() {
         <div className="text-[9px] font-bold uppercase tracking-widest text-[#9a8f82] px-5 pt-3 pb-1">Menu</div>
         <nav className="flex flex-col gap-0.5 px-2.5">
           {NAV.map(n => (
-            <SbItem key={n.key} n={n} active={page === n.key} onClick={() => setPage(n.key)} />
+            <Link key={n.key} to={n.key === "overview" ? "/admin" : `/admin/${n.key}`} style={{ textDecoration: 'none' }}>
+             <SbItem key={n.key} n={n} active={page === n.key} onClick={() => setPage(n.key)} />
+            </Link>
           ))}
         </nav>
 
@@ -152,7 +162,9 @@ export default function MessDashboard() {
         <div className="text-[9px] font-bold uppercase tracking-widest text-[#9a8f82] px-5 pt-4 pb-1">Account</div>
         <nav className="flex flex-col gap-0.5 px-2.5">
           {ACCOUNT_NAV.map(n => (
+           <Link to={n.key === "customers" ? "/admin/customers" : `/admin/${n.key}`} style={{ textDecoration: 'none' }}>
             <SbItem key={n.key} n={n} active={page === n.key} onClick={() => setPage(n.key)} />
+           </Link>
           ))}
         </nav>
 
@@ -204,7 +216,9 @@ export default function MessDashboard() {
 
         {/* Page content */}
         <div className="p-7 pb-24 md:pb-24 pb-24 flex flex-col gap-5 overflow-y-auto md:px-7 px-4">
-          {page === "overview"  && <OverviewPage setPage={setPage} fetchedMenuItems={fetchedItems} users={getallUsers} individual={ownerData} orders={getAllOrders}/>}
+        <Outlet/>
+
+          {/* {page === "overview"  && <OverviewPage setPage={setPage} fetchedMenuItems={fetchedItems} users={getallUsers} individual={ownerData} orders={getAllOrders}/>}
           {page === "orders"    && <OrdersPage orders={getAllOrders}/>}
           {page === "payments"  && <PaymentsPage users={getallUsers} setLoading={setLoader} />}
           {page === "notices"   && <NoticesPage />}
@@ -214,10 +228,12 @@ export default function MessDashboard() {
           {page === "label" && <LabelsPage users={getallUsers} refetchUsers={refetchUsers} />}
           {(page === "customers" || page === "reports" || page === "settings") && (
             <div className="flex items-center justify-center h-64 text-[#9a8f82] text-sm">
-              {/* <CustomersPage/> */}
+              
             </div>
-          )}
+          )} */}
+        
         </div>
+
       </div>
 
       {/* ── Mobile bottom nav ── */}

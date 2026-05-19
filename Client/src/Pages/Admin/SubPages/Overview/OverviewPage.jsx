@@ -1,8 +1,22 @@
+import { Link, useNavigate } from "react-router-dom";
 import { CardHead, DueRow, MenuRow } from "../../../../components/AdminComponents/Shared/SharedComponents";
 import { CardWrap } from "../../../../components/AdminComponents/Shared/SharedComponents";
 import { ChipBadge } from "../../../../components/AdminComponents/Shared/SharedComponents";
+import { useGetMenuItems, useGetOrders, useGetUsers } from "../../../../hooks/Admin/adminHooks";
+import { useGetUserData } from "../../../../hooks/authHooks/authHooks";
+import { jwtDecode } from "jwt-decode";
 
-function OverviewPage({ setPage,fetchedMenuItems,users,orders,individual }) {
+function OverviewPage() {
+
+  const token = localStorage.getItem("login");
+  const decoded = token ? jwtDecode(token) : null;
+  const navigate = useNavigate();
+  const messCode = decoded?.messCode;
+
+   const { data: fetchedMenuItems = [] } = useGetMenuItems(messCode);
+   const { data: users, refetch: refetchUsers } = useGetUsers(messCode);
+   const {data:orders} = useGetOrders(messCode);
+   const {data:individual} = useGetUserData(decoded?._id);
 
   const DUES = [
   { name:"Sneha Desai",    av:"SD", hue:"#7c3aed", since:"8 days",  amt:"₹1,800" },
@@ -145,7 +159,9 @@ console.log(users)
 
          <CardWrap>
         <CardHead title="Today's Menu" right={
-          <button className="text-[11px] font-semibold text-[#c2620a] cursor-pointer" onClick={() => setPage("menu")}>Edit menu →</button>
+          <Link to={"/menu"}>
+          <button className="text-[11px] font-semibold text-[#c2620a] cursor-pointer" >Edit menu →</button>
+          </Link>
         } />
         <div className="px-5 pb-2 pt-1">
           {

@@ -41,13 +41,15 @@ const TYPE_META = {
       return;
     }
     
-    setNotices([{ id: Date.now(), text: noticeText, type: noticeType, time: "Just now" }]);
+  
     
     const data = {
-      text: notices?.[0]?.text || "",
-      type: notices?.[0]?.type || "",
+      text: noticeText || "",
+      type: noticeType || "",
       messCode
     };
+
+    console.log("notices",notices);
 
     setLoader(true)
     postNoticess(data,{

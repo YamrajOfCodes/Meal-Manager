@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {useRegister,useLogin} from "../../hooks/authHooks/authHooks";
+import { protectRoute } from "../../utils/ProtectedRoutes/ProtectedRoutes";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 // Tiffin box SVG icon
 const TiffinIcon = ({ size = 24, color = "white", strokeWidth = 2 }) => (
@@ -176,6 +179,28 @@ export default function TiffinTrackSignIn() {
   const [mode, setMode] = useState("login");
   const [role, setRole] = useState("owner");
   const [form, setForm] = useState({});
+
+  const navigate = useNavigate();
+
+   useEffect(()=>{
+ 
+    const login = localStorage.getItem("login");
+    if(login){
+      const {role} = jwtDecode(login);
+      if(role === "owner"){
+        navigate("/admin");
+      }else if(role === "customer"){
+        navigate("/customer");
+      }else if(role === "super-admin"){
+        navigate("/super-admin");
+      }else{
+        localStorage.removeItem("login");
+       navigate("/login");
+       return;
+      }
+    }
+
+   },[]);
 
 
   const switchMode = (m) => {

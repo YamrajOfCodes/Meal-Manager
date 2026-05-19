@@ -1,6 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import OrderRow from "../../../../components/AdminComponents/OrderRow/OrderRow";
 import MobileOrderCard from "../../../../components/AdminComponents/MobileCards/MobileOrderCard";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { useGetOrders } from "../../../../hooks/Admin/adminHooks";
+import { protectRoute } from "../../../../utils/ProtectedRoutes/ProtectedRoutes";
+
 
 /* ─── tiny helpers ─── */
 const MEAL_EMOJI  = { Breakfast:"☀️", Lunch:"🍛", Dinner:"🌙" };
@@ -38,7 +43,7 @@ function nameHue(str="") {
 /* ════════════════════════════════════════════
    MAIN PAGE
 ════════════════════════════════════════════ */
-function OrdersPage({ orders = [] }) {
+function OrdersPage() {
 
   const [search,    setSearch]    = useState("");
   const [mealTab,   setMealTab]   = useState("All");
@@ -50,10 +55,21 @@ function OrdersPage({ orders = [] }) {
 
   const [Revenues,setRevenue] = useState(0);
 
+  const token = localStorage.getItem("login");
+  const decoded = token ? jwtDecode(token) : null;
+
+  const navigate = useNavigate();
+  const messCode = decoded?.messCode;
+  const {data:orders} = useGetOrders(messCode)
+
+    useEffect(()=>{
+     protectRoute(navigate,"owner");
+  },[navigate]);
+
   console.log(orders);
 
 const filtered = useMemo(() => {
-  let list = orders.filter((order) => {
+  let list = orders?.filter((order) => {
     return (
       new Date(order.createdAt).toDateString() ===
       new Date().toDateString()
@@ -93,14 +109,14 @@ const filtered = useMemo(() => {
 }, [orders, search, mealTab, statusTab]);
 
 const stats = useMemo(() => {
-  const total = filtered.length;
+  const total = filtered?.length;
 
   let revenue = 0;
   const byMeal = {};
   let topMeal = "—";
   let maxCount = 0;
 
-  filtered.forEach((o) => {
+  filtered?.forEach((o) => {
     const items = o.items ?? [{ price: o.price, qty: o.qty ?? 1 }];
 
     // revenue
@@ -123,7 +139,7 @@ const stats = useMemo(() => {
 }, [filtered]);
 
   /* ── empty state ── */
-  const isEmpty = filtered.length === 0;
+  const isEmpty = filtered?.length === 0;
 
   return (
     <div style={{ fontFamily:"'Outfit',sans-serif" }}>
@@ -268,7 +284,7 @@ const stats = useMemo(() => {
     </button>
   ))}
   <span className="ml-auto text-[11px] text-[#9a8f82] leading-7">
-    {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+    {filtered?.length} result{filtered?.length !== 1 ? "s" : ""}
   </span>
 </div>
 
@@ -295,7 +311,7 @@ const stats = useMemo(() => {
           </tr>
         </thead>
         <tbody>
-          {filtered.map((order, i) => (
+          {filtered?.map((order, i) => (
             <OrderRow key={order._id ?? i} order={order} index={i} />
           ))}
         </tbody>
@@ -304,7 +320,7 @@ const stats = useMemo(() => {
 
     {/* mobile */}
     <div className="flex flex-col gap-3 p-3 md:hidden">
-      {filtered.map((order, i) => (
+      {filtered?.map((order, i) => (
         <MobileOrderCard key={order._id ?? i} order={order} index={i} />
       ))}
     </div>

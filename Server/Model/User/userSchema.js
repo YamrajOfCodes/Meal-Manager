@@ -103,8 +103,7 @@ userSchema.methods.generateToken = async function () {
         role: this.role,
         messCode: this.messCode
       },
-      USER_SECRET,
-      { expiresIn: "1d" }
+      USER_SECRET
     );
 
     this.tokens = this.tokens.concat({ token });

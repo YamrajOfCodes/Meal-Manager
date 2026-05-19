@@ -4,9 +4,11 @@ import {
   useCreateLabel,
   useDeleteLabel,
   useGetLabels,
+  useGetUsers,
   useunAssignLabel,
 } from "../../../../hooks/Admin/adminHooks";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const TIERS = ["basic", "silver", "gold", "vip", "custom"];
 
@@ -20,20 +22,26 @@ const TIER_CONFIG = {
 
 const AVATAR_POOL = ["#dbeafe", "#dcfce7", "#fce7f3", "#fef3c7", "#ede9fe"];
 
-export default function DiscountLabels({ users, refetchUsers }) {
+export default function DiscountLabels() {
+
+   
+  const token = localStorage.getItem('login');
+  const decoded = token ? jwtDecode(token) : null;
+  const navigate = useNavigate();
+  const messCode = decoded?.messCode;
+
   const [showCreate, setShowCreate]     = useState(false);
   const [activeLabel, setActiveLabel]   = useState(null);
   const [form, setForm]                 = useState({ name: "", tier: "basic", discount: "", minOrder: "", desc: "" });
   const [checkedUsers, setCheckedUsers] = useState(new Set());
   const [saving, setSaving]             = useState(false);
+  const { data: users, refetch: refetchUsers } = useGetUsers(messCode);
 
   const { mutate: createLabel }     = useCreateLabel();
   const { mutate: deleteLabel }     = useDeleteLabel();
   const { mutate: assigneLabel }    = useAssignLabel();
   const { mutate: unassignedLabel } = useunAssignLabel();
 
-  const token   = localStorage.getItem("login");
-  const decoded = jwtDecode(token);
 
   const { data: getlabels } = useGetLabels(decoded?._id);
 
