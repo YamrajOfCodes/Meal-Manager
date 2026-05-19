@@ -251,7 +251,9 @@ useEffect(() => {
               {n.dot && page !== n.key && (
                 <span className="absolute top-2 right-[calc(50%-14px)] w-1.5 h-1.5 rounded-full bg-red-500" />
               )}
+             <Link key={n.key} to={n.key === "overview" ? "/admin" : `/admin/${n.key}`} style={{ textDecoration: 'none' }}>
               {n.label}
+              </Link>
             </button>
           ))}
         </div>
