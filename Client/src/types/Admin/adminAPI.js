@@ -19,6 +19,16 @@ export const getMenu = (messCode) => {
 }; 
 
 
+export const deleteMenuItem = (menuItemId) => {
+  const token = localStorage.getItem("login");
+  return api.delete(`/admin/deleteMenu/${menuItemId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}; 
+
+
 export const getOrders = (messCode) => {
   const token = localStorage.getItem("login");
   return api.get(`/admin/getOrders/${messCode}`, {

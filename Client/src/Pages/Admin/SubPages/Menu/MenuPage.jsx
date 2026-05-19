@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
-import { useAddMenuItem, useGetMenuItems } from "../../../../hooks/Admin/adminHooks";
+import { useAddMenuItem, useDeleteMenuItem, useGetMenuItems } from "../../../../hooks/Admin/adminHooks";
 import MenuModal from "../../../../components/AdminComponents/MenuModel/MenuModal";
 import MenuStat from "../../../../components/AdminComponents/MenuStats/MenuStat";
 import Loader from "../../../../components/AdminComponents/Shared/Loader";
@@ -39,9 +39,14 @@ export default function MenuPage() {
   const [times, setTimes] = useState({ ...SLOT_TIME });
   const [menu, setMenu] = useState({ Breakfast: [], Lunch: [], Dinner: [] });
   const { mutate: addMenuItems } = useAddMenuItem();
+  const { mutate: deleteMenuItem } = useDeleteMenuItem();
   const [messCode, setMessCode] = useState(null);
   const { data: fetchedItems = [] } = useGetMenuItems(messCode);
   const [loader,setLoader] = useState(false);
+
+
+
+  console.log("fetched items", fetchedItems)
 
 
 useEffect(() => {
@@ -52,29 +57,38 @@ useEffect(() => {
   }
 }, []);
 
- useEffect(() => {
+useEffect(() => {
   if (!fetchedItems.length) return;
 
- const today = new Date().toDateString();
+  const today = new Date().toISOString().split("T")[0];
 
-const grouped = fetchedItems.reduce((acc, item) => {
-  const itemDate = new Date(item.updatedAt).toDateString();
+  const grouped = fetchedItems.reduce(
+    (acc, item) => {
 
-  if (itemDate !== today) return acc; 
+      // use custom date if available
+      const itemDate = item.date
+        ? item.date
+        : new Date(item.updatedAt).toISOString().split("T")[0];
 
-  const mealTime = item.mealTime || "Breakfast";
+      // only today's menu
+      if (itemDate !== today) return acc;
 
-  if (!acc[mealTime]) acc[mealTime] = [];
-  acc[mealTime].push(item);
+      const mealTime =
+        item.mealTime
+          ? item.mealTime.charAt(0).toUpperCase() + item.mealTime.slice(1).toLowerCase()
+          : "Breakfast";
 
-  return acc;
-}, { Breakfast: [], Lunch: [], Snacks: [], Dinner: [] });
+      if (!acc[mealTime]) acc[mealTime] = [];
 
-  console.log(grouped)
+      acc[mealTime].push(item);
 
-  setMenu(prev =>
-    JSON.stringify(prev) !== JSON.stringify(grouped) ? grouped : prev
+      return acc;
+    },
+    { Breakfast: [], Lunch: [], Snacks: [], Dinner: [] }
   );
+
+  setMenu(grouped);
+
 }, [fetchedItems]);
 
   console.log(menu)
@@ -93,47 +107,37 @@ const grouped = fetchedItems.reduce((acc, item) => {
       )
     );
 
-  const save = () => {
-    setLoader(true);
-    const valid = rows.filter((r) => r.name.trim());
-    console.log(valid)
-    if (!valid.length) return;
-    setMenu((p) => ({
-      ...p,
-      [tab]: [
-        ...p[tab],
-        ...valid.map((r) => ({
-          id:       uid++,
-          name:     r.name.trim(),
-          price:    Number(r.price) || 0,
-          isVeg:    r.isVeg,
-          mealTime: tab,    
-        })),
-      ],
-    }));
-     
-    const data = {
-      messCode,
-      name: valid[0].name.trim(),
-      price: Number(valid[0].price) || 0, 
-      isVeg: valid[0].isVeg,
-      mealTime: tab, 
-    }
+ // in parent — replace your current save signature
+const save = ({ date, meal, items }) => {
+  console.log("execute")
+  setLoader(true)
 
-    addMenuItems(data,{
-      onSuccess:()=>{
-        setLoader(false);
-      
-      },
-      onError:()=>{
-        setLoader(false);
-      }
-    });
+  const valid = items?.filter((r) => r.name.trim())
+  if (!valid?.length) return
 
-    closeModal();
-  };
+  const data = {
+    messCode,
+    name: valid[0].name.trim(),
+    price: Number(valid[0].price) || 0,
+    isVeg: valid[0].isVeg,
+    mealTime: meal,
+    date,
+  }
 
-  const del = (id) => setMenu((p) => ({ ...p, [tab]: p[tab].filter((i) => i.id !== id) }));
+  console.log("menu data", data)
+
+  addMenuItems(data, {
+    onSuccess: () => setLoader(false),
+    onError: () => setLoader(false),
+  })
+
+  closeModal()
+}
+
+
+const del = (id) => {
+  deleteMenuItem(id);
+};
 
   return (
     <div className="min-h-screen p-4 sm:p-4">
@@ -236,7 +240,7 @@ const grouped = fetchedItems.reduce((acc, item) => {
               </thead>
               <tbody>
                 {items.map((item, idx) => (
-                  <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors group">
+                  <tr key={item._id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors group">
                     <td className="px-5 py-3.5 text-xs text-gray-300 font-mono">
                       {String(idx + 1).padStart(2, "0")}
                     </td>
@@ -257,7 +261,7 @@ const grouped = fetchedItems.reduce((acc, item) => {
                     <td className="px-2 py-3.5 text-right text-sm font-semibold text-gray-900">₹{item.price}</td>
                     <td className="px-5 py-3.5">
                       <button
-                        onClick={() => del(item.id)}
+                        onClick={() => del(item?._id)}
                         className="opacity-0 group-hover:opacity-100 flex h-6 w-6 items-center justify-center rounded-md text-gray-300 hover:bg-red-50 hover:text-red-500 transition-all"
                       >
                         <Trash2 size={12} />

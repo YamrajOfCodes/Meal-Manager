@@ -14,9 +14,9 @@ import {
   getLabels,
   deleteLabel,
   AssignLabel,
-  UnAssignLabel
+  UnAssignLabel,
+  deleteMenuItem
 } from "../../types/Admin/adminAPI";
-
 
 
 export const useAddMenuItem = () => {
@@ -25,20 +25,25 @@ export const useAddMenuItem = () => {
   return useMutation({
     mutationFn: addMenuItem,
     mutationKey: ["menuItem"],
+
     onSuccess: () => {
+
+      queryClient.invalidateQueries({
+        queryKey: ["menuItem"],
+      });
+
       toast.success("Menu item added successfully");
     },
+
     onError: () => {
       toast.error("Failed to add menu item");
     }
-  })
-
-}
-
+  });
+};
 
 export const useGetMenuItems = (messCode) => {
   return useQuery({
-    queryKey: ["menu", messCode],
+    queryKey: ["menuItem", messCode],
     queryFn: () => getMenu(messCode).then((response) => response.data.data),
     enabled: !!messCode,
     onError: () => {
@@ -46,6 +51,29 @@ export const useGetMenuItems = (messCode) => {
     },
   });
 }
+
+
+export const useDeleteMenuItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteMenuItem,
+    mutationKey: ["menuItem"],
+
+    onSuccess: () => {
+
+      queryClient.invalidateQueries({
+        queryKey: ["menuItem"],
+      });
+
+      toast.success("Menu item deleted successfully");
+    },
+
+    onError: () => {
+      toast.error("Failed to delete menu item");
+    }
+  });
+};
 
 
 export const useGetOrders = (messCode) => {

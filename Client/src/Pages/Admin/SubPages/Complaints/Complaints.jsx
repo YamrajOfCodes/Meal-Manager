@@ -109,12 +109,12 @@ export default function AdminComplaintsPage() {
   
   }
 
-  const filteredComplaints = complaints.filter(complaint => {
+  const filteredComplaints = complaints?.filter(complaint => {
     if (activeFilter === "all") return true;
     return complaint.status === activeFilter;
   });
 
-  const openCount = complaints.filter(c => c.status === "open").length;
+  const openCount = complaints?.filter(c => c.status === "open").length;
 
   const filters = ["all", "open", "resolved"];
 
@@ -235,7 +235,7 @@ export default function AdminComplaintsPage() {
             </div>
           )
         ) : <div style={{ padding: 20, textAlign: "center", color: "#9a8f82" }}>
-          No complaints to show
+            Nothing to show your are good at your job!
         </div>
         }
       </div>

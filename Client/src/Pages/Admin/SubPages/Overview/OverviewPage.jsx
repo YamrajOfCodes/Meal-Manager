@@ -59,17 +59,24 @@ let totalOrdersPrice = list?.reduce((acc,curr)=>{
   
 
   console.log(totalOrdersPrice)
-const today = new Date().toDateString();
+
+const today = new Date().toISOString().split("T")[0];
+
 const grouped = fetchedMenuItems.reduce((acc, item) => {
-  const itemDate = new Date(item.updatedAt).toDateString();
 
-  if (itemDate !== today) return acc; 
+  // use saved date first, fallback to updatedAt
+  const itemDate = item.date
+    ? item.date
+    : new Date(item.updatedAt).toISOString().split("T")[0];
 
-  const mealTime = item.mealTime || "Breakfast";
-  acc.push(item)
+  // skip non-today items
+  if (itemDate !== today) return acc;
+
+  acc.push(item);
 
   return acc;
-},[]);
+
+}, []);
 
 console.log(users)
 

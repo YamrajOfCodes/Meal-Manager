@@ -7,13 +7,13 @@ import DiscountLabel  from "../../Model/Labels/DiscountLabelsSchema.js"
 
 export const addMenuItem = async (req, res) => {
   try {
-    const { messCode, name, price, isVeg, mealTime } = req.body;
+    const { messCode, name, price, isVeg, mealTime,date } = req.body;
 
-    if (!messCode || !name || !price || !mealTime) {
-      return res.status(400).json({ message: "messCode, name, price and mealTime are required" });
+    if (!messCode || !name || !price || !mealTime || !date) {
+      return res.status(400).json({ message: "messCode, name, price, mealTime and date are required" });
     }
 
-    const item = await Menu.create({ messCode, name, price, isVeg, mealTime });
+    const item = await Menu.create({ messCode, name, price, isVeg, mealTime, date });
 
     res.status(201).json({ message: "Menu item added successfully", data: item });
   } catch (error) {
