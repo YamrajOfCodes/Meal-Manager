@@ -10,6 +10,12 @@ export const RegisterUser = async (req, res) => {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
 
+    const presentmessCode = await User.findOne({ messCode });
+
+    if(presentmessCode){
+      return res.status(400).json({message:"Code already exists, please choose a different one"})
+    }
+
     if(phone.length < 10 || phone.length>10){
       return res.status(400).json({error:"please enter valid phone number"});
     }
@@ -21,8 +27,6 @@ export const RegisterUser = async (req, res) => {
       if (!findMessCode) {
         return res.status(400).json({ error: "invalid mess Code" });
       }
-
-          console.log(findMessCode);
     }
 
 
@@ -30,8 +34,12 @@ export const RegisterUser = async (req, res) => {
     const existingUser = await User.findOne({ email });
     const existingMob  = await User.findOne({phone});
 
-    if (existingUser || existingMob) {
-      return res.status(400).json({ message: "User already exists" });
+    if (existingUser) {
+      return res.status(400).json({ message: "email already exists" });
+    } 
+
+    if(existingMob){
+      return res.status(400).json({message:"phone number already exists"})
     }
 
     const newUser = new User({

@@ -238,26 +238,42 @@ useEffect(() => {
 
       {/* ── Mobile bottom nav ── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#e8e2d9] z-50">
-        <div className="flex">
-          {NAV.map(n => (
-            <button
-              key={n.key}
-              onClick={() => setPage(n.key)}
-              className={`flex-1 flex flex-col items-center py-2.5 pb-3 gap-1 text-[9px] font-semibold uppercase tracking-wider border-none bg-transparent cursor-pointer relative transition-colors ${
-                page === n.key ? "text-[#c2620a]" : "text-[#9a8f82]"
-              }`}
-            >
-              <span style={{ color: page === n.key ? "#c2620a" : "#9a8f82" }}>{n.icon}</span>
-              {n.dot && page !== n.key && (
-                <span className="absolute top-2 right-[calc(50%-14px)] w-1.5 h-1.5 rounded-full bg-red-500" />
-              )}
-             <Link key={n.key} to={n.key === "overview" ? "/admin" : `/admin/${n.key}`} style={{ textDecoration: 'none' }}>
-              {n.label}
-              </Link>
-            </button>
-          ))}
-        </div>
-      </nav>
+  <div className="flex">
+    
+    {NAV.map((n) => (
+      
+      <Link
+        key={n.key}
+        to={n.key === "overview" ? "/admin" : `/admin/${n.key}`}
+        className={`flex-1 flex flex-col items-center py-2.5 pb-3 gap-1 text-[9px] font-semibold uppercase tracking-wider relative transition-colors ${
+          page === n.key
+            ? "text-[#c2620a]"
+            : "text-[#9a8f82]"
+        }`}
+      >
+        
+        <span
+          style={{
+            color:
+              page === n.key
+                ? "#c2620a"
+                : "#9a8f82",
+          }}
+        >
+          {n.icon}
+        </span>
+
+        {n.dot && page !== n.key && (
+          <span className="absolute top-2 right-[calc(50%-14px)] w-1.5 h-1.5 rounded-full bg-red-500" />
+        )}
+
+        {n.label}
+
+      </Link>
+    ))}
+    
+  </div>
+     </nav>
 
     
     </div>

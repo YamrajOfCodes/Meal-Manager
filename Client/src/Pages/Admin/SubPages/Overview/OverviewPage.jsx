@@ -159,7 +159,7 @@ console.log(users)
 
          <CardWrap>
         <CardHead title="Today's Menu" right={
-          <Link to={"/menu"}>
+          <Link to={"/admin/menu"}>
           <button className="text-[11px] font-semibold text-[#c2620a] cursor-pointer" >Edit menu →</button>
           </Link>
         } />
