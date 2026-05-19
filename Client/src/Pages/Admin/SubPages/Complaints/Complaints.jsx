@@ -234,7 +234,7 @@ export default function AdminComplaintsPage() {
               </select>
             </div>
           )
-        ) : <div style={{ padding: 20, textAlign: "center", color: "#9a8f82" }}>
+        ) : <div style={{ padding: 20, textAlign: "center", color: "#9a8f82" }} className="text-xs sm:text-sm">
             Nothing to show your are good at your job!
         </div>
         }

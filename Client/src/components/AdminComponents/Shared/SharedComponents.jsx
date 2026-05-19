@@ -181,7 +181,7 @@ export function DueRow({ Due }) {
       />
  
       {/* Avatar */}
-      <AvatarDue initials={Due?.name?.slice(0, 2)} hue={hue} />
+      {/* <AvatarDue initials={Due?.name?.slice(0, 2)} hue={hue} /> */}
  
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
